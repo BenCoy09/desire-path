@@ -32,8 +32,8 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding-top:12px;font:12
 <h2>Parity check</h2><p id="par" class="mute">Running…</p>
 <h2>Measured results</h2>
 <table><tr><th>method (10 test tasks)</th><th>pass</th><th>prompt tokens</th></tr>
-<tr><td>graph_k5</td><td>10/10</td><td>3,241</td></tr><tr><td>bm25_top5</td><td>4/10</td><td>10,835</td></tr><tr><td>preload (42 tools)</td><td>10/10</td><td>29,352</td></tr></table>
-<p class="mute" style="margin-top:8px">Live Gemini runs from the repo’s results folder. Small task set from workflow families the graph learned from. Service load test: 49 ms p95 at 50 concurrent requests with a warm cache, 4.9 s without.</p>
+<tr><td>graph, 5 tools (N100)</td><td>10/10</td><td>3,239</td></tr><tr><td>bm25_top5</td><td>4/10</td><td>10,835</td></tr><tr><td>preload (42 tools)</td><td>10/10</td><td>29,352</td></tr></table>
+<p class="mute" style="margin-top:8px">Live Gemini runs from the repo’s results folder. Small task set from workflow families the graph learned from.</p>
 <footer id="foot">desire-path · snapshot exported from HydraDB, browser runs the same selector · not a live database query</footer>
 </main><script>
 var G,STOP={},K=5;

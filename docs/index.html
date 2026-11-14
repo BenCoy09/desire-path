@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>desire-path</title>
+<style>
+:root{--bg:#e9e3d3;--ink:#14201b;--mute:#5d665f;--line:#c9c2ae;--trail:#d9480f;--dot:#b8b29d}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1713;--ink:#e6e1d0;--mute:#8d968d;--line:#25312a;--trail:#ff7a3d;--dot:#33423a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,serif}
+main{max-width:760px;margin:0 auto;padding:22px 20px 72px}.m,button,textarea,.k{font-family:ui-monospace,Menlo,monospace}
+header{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:14px;font:600 15px ui-monospace,Menlo,monospace}
+header i{margin-left:auto;font-size:12px;color:var(--mute);font-style:normal}
+h1{font-size:clamp(26px,6.5vw,40px);line-height:1.1;margin:28px 0 12px;font-weight:600}h1 em{font-style:normal;color:var(--trail)}
+h2{font:600 12px ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;color:var(--mute);margin:44px 0 8px}
+p{margin:0 0 12px}.mute{color:var(--mute);font-size:14px}
+textarea{width:100%;min-height:84px;background:none;color:var(--ink);border:1px solid var(--ink);padding:10px;font-size:14px;resize:vertical}
+button{font-size:13px;background:none;color:var(--ink);border:1px solid var(--line);padding:8px 11px;min-height:40px;cursor:pointer;margin:6px 6px 0 0}
+button.go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.map{border:1px solid var(--line);margin-top:14px}svg{display:block;width:100%;height:auto}
+.lab{font:9px ui-monospace,Menlo,monospace;fill:var(--ink);font-weight:700}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 12px;border-top:1px solid var(--line);font:13px ui-monospace,Menlo,monospace}
+.row b{color:var(--trail)}.bad{color:var(--trail)}
+table{border-collapse:collapse;width:100%;font:13px ui-monospace,Menlo,monospace}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+footer{margin-top:48px;border-top:1px solid var(--line);padding-top:12px;font:12px ui-monospace,Menlo,monospace;color:var(--mute)}
+</style></head><body><main>
+<header><svg width="28" height="28" viewBox="0 0 32 32" role="img" aria-label="logo"><g fill="var(--dot)"><circle cx="6" cy="6" r="1.8"/><circle cx="16" cy="6" r="1.8"/><circle cx="26" cy="6" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="26" cy="16" r="1.8"/><circle cx="16" cy="26" r="1.8"/><circle cx="26" cy="26" r="1.8"/></g><path d="M6 26 L16 16 L16 6 L26 6" fill="none" stroke="var(--trail)" stroke-width="2" stroke-dasharray="3 2.4" stroke-linecap="round"/><g fill="var(--trail)"><circle cx="6" cy="26" r="2.6"/><circle cx="16" cy="16" r="2.6"/><circle cx="16" cy="6" r="2.6"/><circle cx="26" cy="6" r="3.4"/></g></svg>desire-path<i>HydraDB hackathon · track 2</i></header>
+<h1>The shortest way to a tool is the one <em>agents already walked</em>.</h1>
+<p>Type a task. The learned graph picks the few tools it needs instead of loading all 42.</p>
+<textarea id="q" aria-label="Task" placeholder="Describe a task for the agent"></textarea>
+<div><button class="go" id="go">Trace it</button><span id="ex"></span></div>
+<div class="map"><svg id="f" viewBox="0 0 360 300" role="img" aria-label="Selected tools on the tool graph"></svg><div id="out"></div></div>
+<p class="mute" style="margin-top:8px" id="meta">Loading graph snapshot…</p>
+<h2>Parity check</h2><p id="par" class="mute">Running…</p>
+<h2>Measured results</h2>
+<table><tr><th>method (10 test tasks)</th><th>pass</th><th>prompt tokens</th></tr>
+<tr><td>graph, 5 tools (N100)</td><td>10/10</td><td>3,239</td></tr><tr><td>bm25_top5</td><td>4/10</td><td>10,835</td></tr><tr><td>preload (42 tools)</td><td>10/10</td><td>29,352</td></tr></table>
+<p class="mute" style="margin-top:8px">Live Gemini runs from the repo’s results folder. Small task set from workflow families the graph learned from.</p>
+<footer id="foot">desire-path · snapshot exported from HydraDB, browser runs the same selector · not a live database query</footer>
+</main><script>
+var G,STOP={},K=5;
+function terms(p){var s={};(p.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).forEach(function(w){if(!STOP[w])s[w]=1});return Object.keys(s).sort()}
+function select(p,k){var sc=new Map(),known=0,ts=terms(p);
+ts.forEach(function(w){var t=G.terms[w];if(!t)return;known++;var tot=t.rows.reduce(function(a,r){return a+r[1]},0)||1,idf=Math.log(1+t.ntasks/Math.max(1,t.df));
+t.rows.forEach(function(r){sc.set(r[0],(sc.get(r[0])||0)+idf*r[1]/tot)})});
+if(!sc.size)return{tools:[],known:0,terms:ts.length,fallback:true,sc:sc};
+var rk=Array.from(sc.entries()).sort(function(a,b){return b[1]-a[1]}).map(function(e){return e[0]}),ch=rk.slice(0,Math.min(3,k));
+ch.slice().forEach(function(seed){var rows=G.follow[seed]||[],tot=rows.reduce(function(a,r){return a+r[1]},0)||1;
+rows.slice().sort(function(a,b){return b[1]-a[1]}).forEach(function(r){if(ch.length<k&&ch.indexOf(r[0])<0&&r[1]/tot>=0.25)ch.push(r[0])})});
+for(var i=0;i<rk.length&&ch.length<k;i++)if(ch.indexOf(rk[i])<0)ch.push(rk[i]);
+return{tools:ch,known:known,terms:ts.length,fallback:false,sc:sc}}
+var NS="http://www.w3.org/2000/svg",svg=document.getElementById("f"),pos={};
+function el(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t)e.textContent=t;svg.appendChild(e);return e}
+function draw(res){svg.innerHTML="";var n=G.tools.length;
+G.tools.forEach(function(t,i){var r=Math.sqrt((i+.5)/n)*135,a=i*2.39996;pos[t.id]=[180+r*Math.cos(a),150+r*Math.sin(a)]});
+var sel=res.tools;if(sel.length>1)el("path",{d:"M"+sel.map(function(id){return pos[id].join(" ")}).join(" L"),fill:"none",stroke:"var(--trail)","stroke-width":2,"stroke-linecap":"round"});
+G.tools.forEach(function(t){var on=sel.indexOf(t.id)>-1;el("circle",{cx:pos[t.id][0],cy:pos[t.id][1],r:on?6:2.6,fill:on?"var(--trail)":"var(--dot)"});
+if(on)el("text",{x:pos[t.id][0],y:pos[t.id][1]-9,"text-anchor":"middle","class":"lab"},t.name)})}
+function run(){var p=document.getElementById("q").value.trim(),o=document.getElementById("out");
+if(!p){o.innerHTML='<div class="row"><span class="bad">Type a task first.</span></div>';return}
+var res=select(p,K);draw(res);
+if(res.fallback){o.innerHTML='<div class="row"><span class="bad">No confident match. None of the '+res.terms+' words in this task are in the learned graph, so no tools are offered.</span></div>';return}
+var ch={};G.tools.forEach(function(t){ch[t.id]=t});
+var tok=res.tools.reduce(function(a,id){return a+ch[id].chars},0)/4,all=G.tools.reduce(function(a,t){return a+t.chars},0)/4;
+o.innerHTML=res.tools.map(function(id){var s=res.sc.get(id);return'<div class="row"><span>'+ch[id].name+' <span class="mute">'+ch[id].server+'</span></span><b>'+(s?s.toFixed(2):"via follow edge")+'</b></div>'}).join("")+
+'<div class="row"><span>'+res.known+' of '+res.terms+' words matched the graph</span><span>~'+Math.round(tok).toLocaleString()+' vs ~'+Math.round(all).toLocaleString()+' definition tokens</span></div>'}
+fetch("graph.json").then(function(r){return r.json()}).then(function(g){G=g;g.stop.forEach(function(w){STOP[w]=1});
+var ex=document.getElementById("ex");g.expected.forEach(function(e){var b=document.createElement("button");b.textContent=e.id;b.onclick=function(){document.getElementById("q").value=e.prompt;run()};ex.appendChild(b)});
+document.getElementById("go").onclick=run;draw({tools:[]});
+var ok=0,n=0;g.expected.forEach(function(e){if(e.fallback)return;n++;if(JSON.stringify(select(e.prompt,5).tools)===JSON.stringify(e.tools))ok++});
+document.getElementById("par").innerHTML="This browser selector matches the Python selector reading HydraDB on <b>"+ok+" of "+n+"</b> test tasks (same tools, same order).";
+document.getElementById("meta").textContent=g.tools.length+" tools · "+Object.keys(g.terms).length+" learned terms · snapshot exported "+g.generated}).catch(function(){document.getElementById("meta").textContent="Could not load graph.json"});
+</script></body></html>

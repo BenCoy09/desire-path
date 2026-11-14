@@ -1,0 +1,76 @@
+model gemini-3.1-flash-lite | method bm25_top3 | 8 tasks to run
+T03 FAIL llm=8 prompt_tok=6118 tools=[read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file] | memory missing 'ZX-4471'; memory missing 'Priya'
+T04 FAIL llm=8 prompt_tok=8487 tools=[list_directory,move_file,edit_file,read_graph,move_file,edit_file,edit_file,edit_file] | answer missing 'help@orion.example'
+T05 FAIL llm=8 prompt_tok=5497 tools=[copy_file,read_file,list_directory,read_file,read_file,read_file,read_file,read_file] | joined.txt missing 'charlie-9054'
+T06 FAIL llm=8 prompt_tok=8196 tools=[edit_file,edit_file,edit_file,append_file,edit_file,append_file,append_file,edit_file] | answer missing 'util.js'
+T07 FAIL llm=3 prompt_tok=3274 tools=[sequentialthinking,sequentialthinking] | memory missing 'Growth'
+T08 PASS llm=2 prompt_tok=1134 tools=[move_file]
+T09 FAIL llm=5 prompt_tok=4172 tools=[create_entities,add_observations,add_observations,add_observations] | docs/faq.md missing '45 days'; docs/faq.md still has '30 days'
+T10 FAIL llm=8 prompt_tok=8042 tools=[read_text_file,write_file,write_file,write_file,read_text_file,write_file,write_file,write_file] | file missing reports/errors.txt
+--- bm25_top3: 1/8 passed | mean prompt tokens 5615 | mean LLM calls 6.2
+model gemini-3.1-flash-lite | method preload | 10 tasks to run
+T01 PASS llm=4 prompt_tok=27064 tools=[list_allowed_directories,list_directory,read_text_file]
+T02 PASS llm=3 prompt_tok=20209 tools=[create_directory,write_file]
+T03 PASS llm=5 prompt_tok=34101 tools=[list_allowed_directories,list_directory,read_text_file,create_entities]
+T04 PASS llm=4 prompt_tok=27006 tools=[list_allowed_directories,search_files,read_text_file]
+T05 PASS llm=5 prompt_tok=34144 tools=[list_allowed_directories,list_directory,read_multiple_files,write_file]
+T06 PASS llm=3 prompt_tok=20206 tools=[list_allowed_directories,directory_tree]
+T07 PASS llm=3 prompt_tok=20336 tools=[create_entities,open_nodes]
+T08 PASS llm=4 prompt_tok=27073 tools=[list_allowed_directories,list_directory,move_file]
+T09 PASS llm=5 prompt_tok=35336 tools=[list_allowed_directories,directory_tree,read_text_file,edit_file]
+T10 PASS llm=7 prompt_tok=48050 tools=[list_allowed_directories,list_directory,list_directory,read_text_file,create_directory,write_file]
+--- preload: 10/10 passed | mean prompt tokens 29352 | mean LLM calls 4.3
+model gemini-3.1-flash-lite | method bm25_top5 | 10 tasks to run
+T01 PASS llm=5 prompt_tok=6332 tools=[list_directory,edit_file,edit_file,edit_file]
+T02 FAIL llm=8 prompt_tok=10862 tools=[write_file,append_file,write_file,write_file,write_file,read_text_file,write_file,write_file] | file missing backups/note.txt
+T03 FAIL llm=8 prompt_tok=8885 tools=[read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file] | memory missing 'ZX-4471'; memory missing 'Priya'
+T04 FAIL llm=8 prompt_tok=11354 tools=[list_directory,move_file,edit_file,move_file,copy_file,read_graph,edit_file,edit_file] | answer missing 'help@orion.example'
+T05 FAIL llm=8 prompt_tok=8820 tools=[read_text_file,read_text_file,write_text_file,create_file,write_file,append_file,read_text_file,read_text_file] | file missing joined.txt
+T06 PASS llm=2 prompt_tok=2143 tools=[list_directory_with_sizes]
+T07 FAIL llm=6 prompt_tok=9223 tools=[sequentialthinking,list_directory,sequentialthinking,edit_file,sequentialthinking] | memory missing 'Growth'
+T08 PASS llm=2 prompt_tok=2478 tools=[move_file]
+T09 FAIL llm=8 prompt_tok=43804 tools=[get-env,get-env,get-env,get-env,get-env,get-env,get-env,get-env] | docs/faq.md missing '45 days'; docs/faq.md still has '30 days'
+T10 PASS llm=4 prompt_tok=4445 tools=[read_text_file,create_directory,write_file]
+--- bm25_top5: 4/10 passed | mean prompt tokens 10835 | mean LLM calls 5.9
+model gemini-3.1-flash-lite | method bm25_top3 | 20 tasks to run
+L01 FAIL llm=8 prompt_tok=12367 tools=[list_directory,list_directory,list_directory,sequentialthinking,list_directory,list_directory,list_directory,sequentialthinking] | answer missing 'ZX-4471'
+L02 PASS llm=3 prompt_tok=2984 tools=[edit_file,edit_file]
+L03 FAIL llm=8 prompt_tok=9078 tools=[list_directory,list_directory,edit_file,edit_file,edit_file,edit_file,edit_file,edit_file] | answer missing 'help@orion.example'
+L04 FAIL llm=8 prompt_tok=6347 tools=[write_file,write_file,write_file,write_file,write_file,write_file,write_file,write_file] | file missing reports/summary.txt
+L05 FAIL llm=8 prompt_tok=6356 tools=[write_file,write_file,write_file,write_file,write_file,write_file,write_file,write_file] | file missing exports/status.txt
+L06 FAIL llm=8 prompt_tok=5762 tools=[read_file,add_entity,create_entity,read_graph,write_graph,read_graph,read_graph,search_nodes] | memory missing 'buy milk'; memory missing 'call Dana'; memory missing 'file taxes'
+L07 FAIL llm=8 prompt_tok=6132 tools=[read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file,read_media_file] | memory missing 'March 9'; memory missing 'Marcus'
+L08 FAIL llm=8 prompt_tok=7676 tools=[search_files,read_file,read_file_content,get_file_content,read_file_or_directory,read_file_or_directory_content,read_file_or_directory_details,read_file_or_directory_info] | answer missing 'Orion'
+L09 FAIL llm=8 prompt_tok=8894 tools=[list_directory,move_file,edit_file,edit_file,move_file,move_file,read_graph,edit_file] | answer missing '30 days'
+L10 FAIL llm=8 prompt_tok=5276 tools=[read_file,list_directory,read_file,read_file,read_file,read_file,read_file,read_file] | file missing combined.txt
+L11 FAIL llm=8 prompt_tok=5300 tools=[read_file,read_file,read_file,read_file,read_file,read_file,read_file,read_file] | file missing merged.txt
+L12 FAIL llm=8 prompt_tok=8226 tools=[edit_file,edit_file,edit_file,append_file,append_file,edit_file,append_file,edit_file] | answer missing 'main.py'
+L13 FAIL llm=8 prompt_tok=9609 tools=[edit_file,edit_file,edit_file,edit_file,edit_file,edit_file,edit_file,edit_file] | answer missing 'data.csv'
+L14 FAIL llm=3 prompt_tok=3323 tools=[sequentialthinking,sequentialthinking] | memory missing 'Eli'
+L15 FAIL llm=8 prompt_tok=11009 tools=[sequentialthinking,edit_file,sequentialthinking,edit_file,sequentialthinking,edit_file,sequentialthinking] | memory missing 'Platform'
+L16 PASS llm=2 prompt_tok=1134 tools=[move_file]
+L17 PASS llm=2 prompt_tok=1134 tools=[move_file]
+L18 FAIL llm=7 prompt_tok=5828 tools=[create_entities,delete_observations,create_entities,create_relations,create_entities,create_relations] | project/readme.md missing 'Lyra'; project/readme.md still has 'Orion'
+L19 FAIL llm=7 prompt_tok=4739 tools=[search_nodes,list_entities,open_nodes,delete_observations,search_nodes,delete_observations,delete_observations] | RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+L20 FAIL llm=0 prompt_tok=0 tools=[] | RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resolution>
+--- bm25_top3: 3/20 passed | mean prompt tokens 6059 | mean LLM calls 6.4
+model gemini-3.1-flash-lite | method preload | 5 tasks to run
+L16 PASS llm=4 prompt_tok=27073 tools=[list_allowed_directories,list_directory,move_file]
+L17 PASS llm=4 prompt_tok=27073 tools=[list_allowed_directories,list_directory,move_file]
+L18 PASS llm=5 prompt_tok=33962 tools=[list_allowed_directories,search_files,read_text_file,edit_file]
+L19 PASS llm=5 prompt_tok=34121 tools=[list_allowed_directories,list_directory,read_text_file,edit_file]
+L20 PASS llm=4 prompt_tok=27077 tools=[list_allowed_directories,list_directory,read_text_file]
+--- preload: 5/5 passed | mean prompt tokens 29861 | mean LLM calls 4.4
+connected to HydraDB at 127.0.0.1:28687
+model gemini-3.1-flash-lite | method graph_k5 | 10 tasks to run
+T01 PASS llm=2 prompt_tok=2377 offered=[read_text_file,create_entities,edit_file,write_file,move_file] used=[read_text_file]
+T02 PASS llm=3 prompt_tok=2986 offered=[write_file,create_directory,read_text_file,create_entities,move_file] used=[create_directory,write_file]
+T03 PASS llm=3 prompt_tok=3063 offered=[read_text_file,create_entities,write_file,create_directory,move_file] used=[read_text_file,create_entities]
+T04 PASS llm=3 prompt_tok=3428 offered=[read_text_file,search_files,write_file,create_entities,read_multiple_files] used=[search_files,read_text_file]
+T05 PASS llm=3 prompt_tok=3542 offered=[write_file,read_multiple_files,read_text_file,create_entities,search_files] used=[read_multiple_files,write_file]
+T06 PASS llm=2 prompt_tok=2684 offered=[directory_tree,read_text_file,edit_file,create_entities,write_file] used=[directory_tree]
+T07 PASS llm=4 prompt_tok=2474 offered=[create_entities,read_text_file] used=[create_entities,read_text_file,create_entities]
+T08 PASS llm=3 prompt_tok=2964 offered=[move_file,read_text_file,write_file,create_entities,create_directory] used=[create_directory,move_file]
+T09 PASS llm=4 prompt_tok=5063 offered=[read_text_file,edit_file,search_files,create_entities] used=[search_files,read_text_file,edit_file]
+T10 PASS llm=4 prompt_tok=3829 offered=[write_file,create_directory,read_multiple_files,read_text_file,move_file] used=[create_directory,read_text_file,write_file]
+--- graph_k5: 10/10 passed | mean prompt tokens 3241 | mean LLM calls 3.1

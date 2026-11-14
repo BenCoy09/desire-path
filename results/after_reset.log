@@ -1,0 +1,32 @@
+quota back
+connected to HydraDB at 127.0.0.1:28687
+N=300 graph T01 FAIL prompt_tok=1153 RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resol
+N=300 graph T02 FAIL prompt_tok=0 RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resol
+N=300 graph T03 FAIL prompt_tok=0 RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resol
+N=300 graph T04 FAIL prompt_tok=2225 RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exce
+quota hit, stopping this method
+N=1000 graph T01 PASS prompt_tok=2377 
+N=1000 graph T02 FAIL prompt_tok=0 RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exce
+quota hit, stopping this method
+
+catalog  method   pass   mean_prompt_tokens
+342      graph    0/4    844
+1042     graph    1/2    1188
+connected to HydraDB at 127.0.0.1:28687
+model gemini-3.1-flash-lite | method graph_k5 | 10 tasks to run
+T01 FAIL llm=0 prompt_tok=0 offered=[read_text_file,create_entities,edit_file,write_file,move_file] used=[] | RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://aistudio.google.com/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceede
+quota hit: stopping. Rerun later; finished tasks are skipped.
+--- graph_k5: 0/1 passed | mean prompt tokens 0 | mean LLM calls 0.0
+connected to HydraDB at 127.0.0.1:28687
+model gemini-3.1-flash-lite | method graph_k5 | 10 tasks to run
+T01 FAIL llm=0 prompt_tok=0 offered=[read_text_file,create_entities,edit_file,write_file,move_file] used=[] | RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://aistudio.google.com/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceede
+quota hit: stopping. Rerun later; finished tasks are skipped.
+--- graph_k5: 0/1 passed | mean prompt tokens 0 | mean LLM calls 0.0
+connected to HydraDB at 127.0.0.1:28687
+N=100 preload T01 FAIL prompt_tok=0 RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resol
+N=100 preload T02 FAIL prompt_tok=0 RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exce
+quota hit, stopping this method
+
+catalog  method   pass   mean_prompt_tokens
+142      preload  0/2    0
+ALL DONE

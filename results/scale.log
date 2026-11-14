@@ -1,0 +1,17 @@
+connected to HydraDB at 127.0.0.1:28687
+N=100 graph T01 PASS prompt_tok=2377 
+N=100 graph T02 PASS prompt_tok=2986 
+N=100 graph T03 PASS prompt_tok=3049 
+N=100 graph T04 PASS prompt_tok=3428 
+N=100 graph T05 PASS prompt_tok=3542 
+N=100 graph T06 PASS prompt_tok=2684 
+N=100 graph T07 PASS prompt_tok=2474 
+N=100 graph T08 PASS prompt_tok=2964 
+N=100 graph T09 PASS prompt_tok=5060 
+N=100 graph T10 PASS prompt_tok=3829 
+
+catalog  method   pass   mean_prompt_tokens
+142      graph    10/10  3239
+connected to HydraDB at 127.0.0.1:28687
+N=300 graph T01 FAIL prompt_tok=0 RuntimeError: HTTP 429: {   "error": {     "code": 429,     "message": "You exce
+quota hit, stopping this method

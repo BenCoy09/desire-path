@@ -1,0 +1,2 @@
+connected to HydraDB at 127.0.0.1:28687
+N=100 preload T01 FAIL prompt_tok=19293 RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resol

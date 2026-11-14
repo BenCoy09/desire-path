@@ -1,0 +1,6 @@
+first request (cold only if traverse was just restarted): 87 ms
+ conc    ok    rps    p50    p95    p99  srv p95
+    1   200  220.3      2      4     87        0
+    5   200  762.1      6      8     10        0
+   20   200  174.9      9   1020   1043        0
+   50   200  138.7     19   1054   1249        0

@@ -1,138 +1,61 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>desire-path: pick the few tools a task needs</title>
-<meta name="description" content="A tool-selection graph learned from real agent runs and stored in HydraDB.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 26L16 16 16 6 27 6' fill='none' stroke='%232447f5' stroke-width='3' stroke-dasharray='4 3'/%3E%3C/svg%3E">
-<style>
-:root{--bg:#eef2ee;--ink:#1a2730;--mute:#56656c;--line:#cdd7d0;--trail:#2447f5;--dot:#aebbb3;--soft:#e2e9e3}
-:root{color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#0f161a;--ink:#e3ebe6;--mute:#93a39b;--line:#25323a;--trail:#86a3ff;--dot:#33434b;--soft:#16212a}}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-a{color:var(--ink)}a:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid var(--trail);outline-offset:2px}
-.w{max-width:880px;margin:0 auto;padding:0 20px}
-nav{position:relative;display:flex;gap:18px;align-items:center;padding:16px 68px 16px 0;min-height:76px;border-bottom:1px solid var(--line);font-size:15px;flex-wrap:wrap}
-nav b{font-size:17px;margin-right:auto}nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--ink)}
-h1{font-size:clamp(30px,7vw,52px);line-height:1.08;letter-spacing:-.02em;margin:34px 0 14px;max-width:16em}
-h2{font-size:24px;margin:56px 0 10px;letter-spacing:-.01em}
-p{margin:0 0 14px;max-width:62ch}.mute{color:var(--mute);font-size:15px}
-textarea{width:100%;min-height:78px;background:var(--bg);color:var(--ink);border:1.5px solid var(--ink);border-radius:6px;padding:11px;font:16px/1.45 inherit;resize:vertical}
-button{font:inherit;font-size:15px;background:none;color:var(--ink);border:1.5px solid var(--line);border-radius:6px;padding:8px 12px;min-height:44px;cursor:pointer}
-button.go{background:var(--trail);color:#fff;border-color:var(--trail);font-weight:600}
-@media (prefers-color-scheme:dark){button.go{color:#0f161a}}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.chips button{font-size:14px;text-align:left}
-.map{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:14px;background:var(--soft)}
-svg{display:block;width:100%;height:auto;max-height:420px}.lab{font:600 10px "Avenir Next","Segoe UI",sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--soft);stroke-width:3px}
-.trail{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw .9s ease forwards}
-@keyframes draw{to{stroke-dashoffset:0}}@media (prefers-reduced-motion:reduce){.trail{animation:none;stroke-dashoffset:0}}
-.res{padding:6px 0}.row{display:flex;justify-content:space-between;gap:12px;padding:9px 2px;border-top:1px solid var(--line)}.row:first-child{border-top:0}
-.row small{color:var(--mute)}.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0 2px}.bar i{display:block;height:100%;background:var(--trail)}
-.note{padding:12px 2px;color:var(--mute);font-size:15px}.err{color:var(--ink);border-left:4px solid var(--trail);padding:8px 12px;margin:10px 0}
-table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mute);font-weight:600}tr.hl td{font-weight:700}
-.cmd{display:flex;gap:8px;align-items:flex-start;margin:8px 0}.cmd code{flex:1;background:var(--soft);padding:9px 11px;border-radius:6px;font:14px/1.45 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
-.cmd button{min-height:38px;font-size:13px}ol{padding-left:22px;max-width:62ch}li{margin:0 0 8px}
-footer{margin:56px 0 30px;padding-top:14px;border-top:1px solid var(--line);color:var(--mute);font-size:14px}
-#logo{position:absolute;right:0;top:10px;width:56px;height:56px}
-</style></head><body><div class="w">
-<nav><b>desire-path</b><a href="#try">Try it</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#run">Run it</a><a href="https://github.com/BenCoy09/desire-path">GitHub</a><canvas id="logo" aria-hidden="true"></canvas></nav>
-<h1>Agents carry 42 tools into every call. Most tasks need three.</h1>
-<p>desire-path learns which tools a task actually uses from real agent runs, keeps that knowledge as a graph in HydraDB, and hands the agent only those tools. On our 10 held-out tasks it passed all 10 using about nine times fewer prompt tokens than loading everything.</p>
-<h2 id="try" style="margin-top:30px">Try a task</h2>
-<p class="mute">Pick a task or type your own. The page selects tools from the learned graph, right in your browser, and draws the path it chose.</p>
-<textarea id="q" aria-label="Describe a task for the agent" placeholder="For example: read plan.txt and tell me the launch date"></textarea>
-<div><button class="go" id="go">Select tools</button></div>
-<div class="chips" id="ex" aria-label="Example tasks"></div>
-<div class="map"><svg id="f" viewBox="0 0 360 300" role="img" aria-label="Map of all tools with the selected path highlighted"></svg>
-<div class="res" id="out" aria-live="polite"><div class="note">Loading the graph snapshot.</div></div></div>
-<p class="mute" id="meta" style="margin-top:10px"></p>
-<p class="mute" id="par"></p>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desire Path: agents that learn which tools they need</title>
+<meta name="description" content="Tool routing for AI agents. A graph in HydraDB learns which tools tasks really use, so agents load only what they need.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
+<nav><div class="wrap">
+<a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a>
+<a href="#how">How it works</a><a href="#proof">Proof</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+<a class="btn pri" href="app.html">Open the app</a></div></nav>
 
-<h2 id="how">How it works</h2>
-<ol><li>Real agent runs on the learning tasks are recorded: which tools were used for which words in the task.</li>
-<li>Those links between words and tools, plus tools that tend to follow each other, are stored as a graph in HydraDB.</li>
-<li>For a new task, the selector scores tools by the words it recognizes, rarer words counting more, and adds tools that usually follow the top picks.</li>
-<li>If none of the words are known, it says so and offers no tools. It does not guess.</li></ol>
-<p class="mute">This page runs the same selector on an exported snapshot of the graph. It is a snapshot, not a live database query.</p>
+<header class="wrap" style="padding:64px 20px 24px">
+<span class="tag">Built on HydraDB</span>
+<h1>Your agent should load only the tools it needs.</h1>
+<p class="mut" style="max-width:640px;font-size:19px">Most agents preload every tool definition into the prompt. Desire Path learns which tools tasks actually use and finds them by walking a graph, so prompts stay small and the agent gets sharper with use.</p>
+<a class="btn pri" href="app.html">Try it live</a><a class="btn" href="#proof">See the proof</a>
+</header>
 
-<h2 id="results">What we measured</h2>
-<p>Real Gemini runs (gemini-3.1-flash-lite) on 10 held-out tasks, one run each. Code checks the answers, files and memory, not an LLM judge.</p>
-<table><tr><th>Method</th><th>Passed</th><th>Prompt tokens per task</th><th>LLM calls</th></tr>
-<tr><td>Load all 42 tools</td><td>10/10</td><td>29,352</td><td>4.3</td></tr>
-<tr><td>BM25 keywords, top 5</td><td>4/10</td><td>10,835</td><td>5.9</td></tr>
-<tr><td>BM25 keywords, top 3</td><td>2/10</td><td>5,622</td><td>6.3</td></tr>
-<tr class="hl"><td>desire-path graph, 5 tools</td><td>10/10</td><td>3,239</td><td>3.1</td></tr></table>
-<p class="mute">Offline check without calling the model: the share of needed tools the selector offered (recall, as defined in scripts/offline_eval.py). Graph: 0.97 at 3 tools, 1.00 at 4 or more. BM25: 0.27 at 3 tools, 0.60 at 8. This check ran on an in-memory copy, not HydraDB.</p>
-<h2 style="font-size:19px;margin-top:30px">What this does not show</h2>
-<ul class="mute"><li>Ten test tasks, one run each. A small sample.</li><li>The test tasks are new instances of workflows the graph learned from. We have not shown it works on new kinds of work.</li><li>We compared against loading everything and one-shot keyword search. We have not yet compared against an agent that can search again, or against embeddings.</li><li>Runs with 300 and 1,000 tools hit API quota errors, so we have no result for them.</li></ul>
+<section><div class="wrap"><h2>Paths before pavement</h2>
+<p class="mut" style="max-width:700px">Park designers know the pattern: people ignore the paved route and wear a dirt track along the shortcut they actually want. These are called desire paths, and some campuses now wait to see where people walk before laying any stone.</p>
+<p class="mut" style="max-width:700px">Agent tooling is still paved in advance, with every tool listed in every prompt. We do it the other way round. Let the agent walk, record which tools real tasks needed, and make those trails the map.</p></div></section>
 
-<h2 id="run">Run it yourself</h2>
-<p>You need HydraDB built from its repository, Node, Python, and a Gemini API key kept out of the repo.</p>
-<div class="cmd"><code>git clone https://github.com/BenCoy09/desire-path
-cd desire-path &amp;&amp; python3 -m venv .venv &amp;&amp; source .venv/bin/activate
-pip install -r requirements.txt</code><button data-c>Copy</button></div>
-<div class="cmd"><code>python scripts/ingest_tools.py
-python scripts/run_agent.py --method preload --split test</code><button data-c>Copy</button></div>
-<p class="mute">The README lists every step, including starting HydraDB.</p>
-<footer>desire-path was built for the HydraDB hackathon, track 2. It is unrelated to scbrown/desire-path, which tracks failed tool calls.</footer>
-</div>
+<section id="how"><div class="wrap"><h2>How it works</h2><div class="grid">
+<div class="card"><h3>1. Learn</h3><p class="mut">Successful runs become edges in HydraDB: task words point to the tools that were needed, and tools point to the ones that usually come next.</p></div>
+<div class="card"><h3>2. Traverse</h3><p class="mut">A new task walks those edges in milliseconds. No model call, and only the matching tool definitions go into the prompt.</p></div>
+<div class="card"><h3>3. Improve</h3><p class="mut">Every confirmed run strengthens the trail. Teach it in the app and watch the next routing change.</p></div></div></div></section>
+
+<section id="proof"><div class="wrap"><h2>Proof, from our own test run</h2>
+<p class="mut">Recall of the tools the agent really needed on held-out tasks, as it learns more traces. Loaded live from the saved results.</p>
+<div class="card"><div id="ks"></div><svg id="ch" viewBox="0 0 600 260" style="width:100%"></svg><div id="lg" class="mut" style="font-size:14px"></div></div></div></section>
+
+<section id="pricing"><div class="wrap"><h2>Pricing</h2><p class="mut">Proposed early-access plans. We are not charging yet.</p><div class="grid">
+<div class="card"><h3>Open source</h3><p><b>Free</b></p><p class="mut">Self-host with HydraDB. Full routing and learning.</p><a class="btn" href="https://github.com/BenCoy09/desire-path">View on GitHub</a></div>
+<div class="card hl"><h3>Team</h3><p><b>$49 / month</b> (proposed)</p><p class="mut">Hosted graph, usage dashboard, shared learning across your agents.</p><a class="btn pri" href="https://github.com/BenCoy09/desire-path/issues">Request early access</a></div>
+<div class="card"><h3>Enterprise</h3><p><b>Let's talk</b></p><p class="mut">Private deployment, audit trail, custom tool catalogs.</p><a class="btn" href="https://github.com/BenCoy09/desire-path/issues">Contact</a></div></div></div></section>
+
+<section id="faq"><div class="wrap"><h2>FAQ</h2>
+<details><summary>Does it call an LLM to pick tools?</summary><p>No. Routing is graph traversal in HydraDB. The only model calls are in your own agent.</p></details>
+<details><summary>Why a graph and not a plain store?</summary><p>The sequence edges (this tool usually follows that one) are traversals. A flat keyword store cannot follow them.</p></details>
+<details><summary>Is the demo saved forever?</summary><p>No. The hosted demo runs on a free instance, so what you teach it resets when the server restarts.</p></details>
+<details><summary>What do you store about me?</summary><p>Only settings in your own browser. No tracking runs today. Analytics stay off unless you allow them.</p></details>
+<details><summary>Can I run it myself?</summary><p>Yes. The code is open source and uses the open-source HydraDB engine.</p></details></div></section>
+
+<footer><div class="wrap">Desire Path, built for the HydraDB hackathon. <a href="https://github.com/BenCoy09/desire-path">GitHub</a> · <a href="explore.html">Graph explorer</a> · <a href="app.html#settings">Cookie settings</a></div></footer>
+
 <script>
-var G,STOP={},K=5;
-function terms(p){var s={};(p.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).forEach(function(w){if(!STOP[w])s[w]=1});return Object.keys(s).sort()}
-function select(p,k){var sc=new Map(),known=0,ts=terms(p);
-ts.forEach(function(w){var t=G.terms[w];if(!t)return;known++;var tot=t.rows.reduce(function(a,r){return a+r[1]},0)||1,idf=Math.log(1+t.ntasks/Math.max(1,t.df));
-t.rows.forEach(function(r){sc.set(r[0],(sc.get(r[0])||0)+idf*r[1]/tot)})});
-if(!sc.size)return{tools:[],known:0,terms:ts.length,fallback:true,sc:sc};
-var rk=Array.from(sc.entries()).sort(function(a,b){return b[1]-a[1]}).map(function(e){return e[0]}),ch=rk.slice(0,Math.min(3,k));
-ch.slice().forEach(function(seed){var rows=G.follow[seed]||[],tot=rows.reduce(function(a,r){return a+r[1]},0)||1;
-rows.slice().sort(function(a,b){return b[1]-a[1]}).forEach(function(r){if(ch.length<k&&ch.indexOf(r[0])<0&&r[1]/tot>=0.25)ch.push(r[0])})});
-for(var i=0;i<rk.length&&ch.length<k;i++)if(ch.indexOf(rk[i])<0)ch.push(rk[i]);
-return{tools:ch,known:known,terms:ts.length,fallback:false,sc:sc}}
-var NS="http://www.w3.org/2000/svg",svg=document.getElementById("f"),pos={},$=function(i){return document.getElementById(i)};
-function el(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t)e.textContent=t;svg.appendChild(e);return e}
-function draw(sel){svg.innerHTML="";var n=G.tools.length;
-G.tools.forEach(function(t,i){var r=Math.sqrt((i+.5)/n)*135,a=i*2.39996;pos[t.id]=[180+r*Math.cos(a),150+r*Math.sin(a)]});
-if(sel.length>1){var pa=el("path",{d:"M"+sel.map(function(id){return pos[id].join(" ")}).join(" L"),fill:"none",stroke:"var(--trail)","stroke-width":2.5,"stroke-linecap":"round","stroke-linejoin":"round","class":"trail"});pa.style.setProperty("--len",Math.ceil(pa.getTotalLength())+1)}
-G.tools.forEach(function(t){var on=sel.indexOf(t.id)>-1;var c=el("circle",{cx:pos[t.id][0],cy:pos[t.id][1],r:on?6:2.8,fill:on?"var(--trail)":"var(--dot)"});el("title",{},t.name);
-if(on)el("text",{x:pos[t.id][0],y:pos[t.id][1]-10,"text-anchor":"middle","class":"lab"},t.name)})}
-function run(){var p=$("q").value.trim(),o=$("out");
-if(!p){draw([]);o.innerHTML='<div class="err">Type a task, or tap one of the examples above.</div>';return}
-var res=select(p,K);
-if(res.fallback){draw([]);o.innerHTML='<div class="err">No confident match. None of the '+res.terms+' words in this task are in the learned graph, so no tools are offered. In a real agent this is the signal to fall back to a wider tool set.</div>';return}
-draw(res.tools);var ch={},all=0,sel=0;G.tools.forEach(function(t){ch[t.id]=t;all+=t.chars});res.tools.forEach(function(id){sel+=ch[id].chars});
-var pct=Math.round(100*sel/all);
-o.innerHTML=res.tools.map(function(id){var s=res.sc.get(id);return'<div class="row"><span>'+ch[id].name+' <small>'+ch[id].server+'</small></span><small>'+(s?"score "+s.toFixed(2):"follows a top pick")+'</small></div>'}).join("")+
-'<div class="note">'+res.known+' of '+res.terms+' words in this task matched the graph. Selected: '+res.tools.length+' of '+G.tools.length+' tools, '+pct+'% of the definition text an agent would otherwise load.<div class="bar"><i style="width:'+pct+'%"></i></div></div>'}
-fetch("graph.json").then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(g){G=g;g.stop.forEach(function(w){STOP[w]=1});
-var ex=$("ex");g.expected.slice(0,5).forEach(function(e){var b=document.createElement("button");b.textContent=e.prompt.length>46?e.prompt.slice(0,44)+"…":e.prompt;b.onclick=function(){$("q").value=e.prompt;run()};ex.appendChild(b)});
-$("go").onclick=run;draw([]);
-var ok=0,n=0;g.expected.forEach(function(e){if(e.fallback)return;n++;if(JSON.stringify(select(e.prompt,5).tools)===JSON.stringify(e.tools))ok++});
-$("par").textContent="Parity check: this browser selector returns the same tools, in the same order, as the Python selector that read HydraDB on "+ok+" of "+n+" test tasks.";
-$("meta").textContent=g.tools.length+" tools and "+Object.keys(g.terms).length+" learned words, snapshot exported "+g.generated+".";
-if(g.expected[0]){$("q").value=g.expected[0].prompt;run()}else{$("out").innerHTML='<div class="note">Type a task and select tools.</div>'}
-}).catch(function(){$("out").innerHTML='<div class="err">The graph snapshot did not load. Check that graph.json sits next to this page, then reload.</div>'});
-document.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){var t=b.previousElementSibling.textContent;try{navigator.clipboard.writeText(t).then(function(){b.textContent="Copied"})}catch(e){b.textContent="Select and copy"}setTimeout(function(){b.textContent="Copy"},1800)}});
-
-(function(){
-var c=document.getElementById("logo");if(!c||!c.getContext)return;
-var S=56,d=Math.min(window.devicePixelRatio||1,2),x=c.getContext("2d");
-c.width=c.height=S*d;c.style.width=c.style.height=S+"px";x.scale(d,d);
-var still=matchMedia("(prefers-reduced-motion:reduce)").matches,dark=matchMedia("(prefers-color-scheme:dark)"),col={};
-function colors(){var cs=getComputedStyle(document.documentElement);["--dot","--trail","--ink"].forEach(function(k){col[k]=cs.getPropertyValue(k).trim()})}
-colors();if(dark.addEventListener)dark.addEventListener("change",colors);
-var L=[],i,j,k;for(i=-1;i<=1;i++)for(j=-1;j<=1;j++)for(k=-1;k<=1;k++)L.push([i,j,k]);
-var T=[[-1,1,0],[0,0,0],[0,-1,1],[1,-1,-1]];
-function P(p,a){var ca=Math.cos(a),sa=Math.sin(a),X=p[0]*ca+p[2]*sa,Z=-p[0]*sa+p[2]*ca,t=.5,Y=p[1]*Math.cos(t)-Z*Math.sin(t),Z2=p[1]*Math.sin(t)+Z*Math.cos(t),s=1/(1-Z2*.16);return{x:S/2+X*11*s,y:S/2+Y*11*s,z:Z2,s:s}}
-function walker(u){var n=T.length-1,f=u*n,i=Math.min(n-1,Math.floor(f)),t=f-i,a=T[i],b=T[i+1];return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
-function frame(a,u){x.clearRect(0,0,S,S);
-L.map(function(p){return P(p,a)}).sort(function(m,n){return m.z-n.z}).forEach(function(q){x.globalAlpha=.35+.35*(q.z+1)/2;x.fillStyle=col["--dot"];x.beginPath();x.arc(q.x,q.y,1.2*q.s,0,6.3);x.fill()});
-x.globalAlpha=1;var q=T.map(function(p){return P(p,a)});
-x.strokeStyle=col["--trail"];x.lineWidth=2;x.lineCap=x.lineJoin="round";x.setLineDash([4,3]);x.beginPath();q.forEach(function(p,n){n?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y)});x.stroke();x.setLineDash([]);
-x.fillStyle=col["--trail"];q.forEach(function(p){x.beginPath();x.arc(p.x,p.y,2.6*p.s,0,6.3);x.fill()});
-var w=P(walker(u),a);x.fillStyle=col["--ink"];x.beginPath();x.arc(w.x,w.y,3.2*w.s,0,6.3);x.fill();x.strokeStyle=col["--trail"];x.lineWidth=1.5;x.beginPath();x.arc(w.x,w.y,5.5*w.s,0,6.3);x.stroke()}
-if(still){frame(.7,.5);return}
-var a=.7,u=0,v=.6,vt=.6,last=performance.now();
-c.addEventListener("pointerenter",function(){vt=2.4});c.addEventListener("pointerleave",function(){vt=.6});
-(function loop(now){var dt=Math.min(.05,(now-last)/1000);last=now;v+=(vt-v)*Math.min(1,dt*6);a+=dt*v;u=(u+dt*.22*(v/.6))%1;frame(a,u);requestAnimationFrame(loop)})(last);
-})();
+var D=null,COL=["#c4521a","#2d5a45","#7a6bd1","#b08a1a"];
+function draw(k){var rows=D.filter(function(x){return x.k===k}),ms={};
+rows.forEach(function(x){(ms[x.method]=ms[x.method]||[]).push(x)});
+var mx=Math.max.apply(null,rows.map(function(x){return x.n}))||1,svg=document.getElementById("ch"),h="",l="";
+[0,.25,.5,.75,1].forEach(function(v){var y=230-v*210;h+='<line x1="40" x2="590" y1="'+y+'" y2="'+y+'" stroke="currentColor" opacity=".12"/><text x="4" y="'+(y+4)+'" font-size="11" fill="currentColor" opacity=".6">'+v.toFixed(2)+'</text>'});
+Object.keys(ms).forEach(function(m,i){var p=ms[m].sort(function(a,b){return a.n-b.n}).map(function(x){return(40+x.n/mx*550).toFixed(1)+","+(230-x.recall*210).toFixed(1)}).join(" ");
+h+='<polyline fill="none" stroke="'+COL[i%4]+'" stroke-width="3" points="'+p+'"/>';l+='<span style="color:'+COL[i%4]+'">&#9632;</span> '+m+' &nbsp; '});
+h+='<text x="40" y="252" font-size="11" fill="currentColor" opacity=".6">learned tasks: 0 to '+mx+'</text>';
+svg.innerHTML=h;document.getElementById("lg").innerHTML=l+"(recall at k="+k+" tools)"}
+fetch("/curve").then(function(r){return r.json()}).then(function(d){D=d;
+var ks=[];d.forEach(function(x){if(ks.indexOf(x.k)<0)ks.push(x.k)});ks.sort(function(a,b){return a-b});
+var box=document.getElementById("ks");ks.forEach(function(k){var b=document.createElement("button");b.className="btn";b.textContent="k="+k;b.onclick=function(){draw(k)};box.appendChild(b)});
+draw(ks.indexOf(5)>=0?5:ks[0])}).catch(function(){document.getElementById("lg").textContent="Chart unavailable"});
 </script></body></html>

@@ -8,20 +8,31 @@ def _c():
     import psycopg
     return psycopg.connect(URL, connect_timeout=15, autocommit=True)
 
-def init():
+def q(sql, args=(), one=False, many=False):
     with _c() as c:
-        c.execute("CREATE TABLE IF NOT EXISTS lessons (id BIGSERIAL PRIMARY KEY, task TEXT NOT NULL, tools TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now())")
+        cur = c.execute(sql, args)
+        if one:
+            return cur.fetchone()
+        if many:
+            return cur.fetchall()
 
-def add(task, tools):
+def init():
+    q("CREATE TABLE IF NOT EXISTS lessons (id BIGSERIAL PRIMARY KEY, task TEXT NOT NULL, tools TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now())")
+    q("ALTER TABLE lessons ADD COLUMN IF NOT EXISTS user_id BIGINT")
+    q("CREATE TABLE IF NOT EXISTS users (id BIGSERIAL PRIMARY KEY, email TEXT UNIQUE NOT NULL, pw TEXT NOT NULL, verified BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT now())")
+    q("CREATE TABLE IF NOT EXISTS tokens (hash TEXT PRIMARY KEY, user_id BIGINT NOT NULL, kind TEXT NOT NULL, expires TIMESTAMPTZ NOT NULL)")
+
+def add(task, tools, uid=None):
     if not URL:
         return False
-    with _c() as c:
-        c.execute("INSERT INTO lessons (task, tools) VALUES (%s, %s)", (task, json.dumps(tools)))
+    q("INSERT INTO lessons (task, tools, user_id) VALUES (%s, %s, %s)", (task, json.dumps(tools), uid))
     return True
+
+def count(uid):
+    return q("SELECT count(*) FROM lessons WHERE user_id=%s", (uid,), one=True)[0]
 
 def all_lessons():
     if not URL:
         return []
-    with _c() as c:
-        rows = c.execute("SELECT task, tools FROM lessons ORDER BY id").fetchall()
-    return [(r[0], json.loads(r[1])) for r in rows]
+    rows = q("SELECT user_id, task, tools FROM lessons ORDER BY id", many=True)
+    return [(r[0], r[1], json.loads(r[2])) for r in rows]

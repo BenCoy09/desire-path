@@ -7,9 +7,9 @@ common.patch()
 import traverse as tv                      # connects to HydraDB, builds the selector
 from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer
-import learn, evalrun
+import learn, evalrun, accounts
 EVAL_LOCK = threading.Lock()
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 SITE = common.ROOT / "site"
 PROMPTS = [t["prompt"] for t in tv.ra.TASKS if t["split"] == "test"]
@@ -50,6 +50,8 @@ def run_bench():
 class Hosted(tv.H):
     def do_GET(self):
         u = urlparse(self.path)
+        if accounts.handle(self, "GET", u.path, parse_qs(u.query), None):
+            return
         if u.path in ("/select", "/health"):
             return super().do_GET()
         if u.path == "/status":
@@ -76,13 +78,14 @@ class Hosted(tv.H):
         return self.file(p)
 
     def do_POST(self):
-        if urlparse(self.path).path != "/learn":
-            return self.reply(404, {"error": "not found"})
         try:
             n = int(self.headers.get("Content-Length", 0))
             if n > 20000:
                 raise ValueError("body too large")
             body = json.loads(self.rfile.read(n) or b"{}")
+            path = urlparse(self.path).path
+            if path != "/learn":
+                return accounts.handle(self, "POST", path, {}, body) or self.reply(404, {"error": "not found"})
             return self.reply(200, learn.teach(body.get("task", ""), body.get("tools") or [], (self.headers.get("X-Forwarded-For", "").split(",")[0].strip() or self.client_address[0])))
         except ValueError as e:
             return self.reply(400, {"error": str(e)})

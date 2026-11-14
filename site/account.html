@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
+<nav><div class="wrap"><a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a><a href="docs.html">Docs</a></div></nav>
+<main class="wrap" style="max-width:440px;padding-top:32px">
+<svg viewBox="0 0 300 80" style="width:100%"><path id="tr" d="M10 70C60 70 70 20 130 40S220 10 290 10" fill="none" stroke="var(--ac)" stroke-width="3" stroke-dasharray="6 6"/><circle r="6" fill="var(--ac2)"><animateMotion dur="4s" repeatCount="indefinite"><mpath href="#tr"/></animateMotion></circle></svg>
+<h1 style="font-size:32px">Your own workspace</h1><p class="mut">A private graph that learns from your tasks.</p>
+<div class="tabs"><a class="tab on" id="ts" href="#signup">Sign up</a><a class="tab" id="tl" href="#login">Log in</a></div>
+<div class="card"><p><label>Email</label><input id="em" type="email" autocomplete="email"></p><p><label>Password (8+ characters)</label><input id="pw" type="password" autocomplete="current-password"></p>
+<button class="btn pri" id="go">Create account</button><p id="msg" class="mut"></p></div></main>
+<script>
+var $=function(i){return document.getElementById(i)},mode="signup";
+function view(){mode=location.hash==="#login"?"login":"signup";$("ts").className=mode==="signup"?"tab on":"tab";$("tl").className=mode==="login"?"tab on":"tab";$("go").textContent=mode==="signup"?"Create account":"Log in"}
+addEventListener("hashchange",view);view();
+$("go").onclick=function(){var m=$("msg");m.textContent="Working...";
+fetch("/auth/"+mode,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("em").value,password:$("pw").value})}).then(function(r){return r.json()}).then(function(d){
+if(d.error){m.textContent=d.error;return}
+if(mode==="login"){location="dashboard.html";return}
+m.textContent="";
+if(d.demo_link){var a=document.createElement("a");a.href=d.demo_link;a.textContent="Verify my email";m.append("Demo mode: email sending is not set up on this server. ",a)}
+else m.textContent=d.emailed?"Check your inbox (and spam) for the verification link.":"We could not send the email. Try again later."}).catch(function(){m.textContent="Server unreachable"})};
+</script></body></html>

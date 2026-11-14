@@ -104,3 +104,58 @@ def teach(task, tools, ip=""):
         return {"task": task, "taught": tools, "terms": terms, "persisted": saved,
                 "edges_written": {"USED_FOR": used, "FOLLOWS": fol},
                 "before": before, "after": [t["id"] for t in tv.sel.select(task, 5)[0]]}
+
+
+# ---- per-user private layer: user-scoped Term nodes pointing at the shared Tool nodes
+PQ = ("MATCH (w:Term {id: %d})-[r:USED_FOR]->(t:Tool) RETURN w.df AS df, "
+      "t.server AS server, t.name AS name, r.count AS c")
+
+
+def apply_user(db, uid, task, tools, terms):
+    tr, ur = [], []
+    for w in terms:
+        vid = nid(f"u{uid}:term:{w}")
+        rows = db.run(PQ % vid)
+        cur = {f"{r['server']}__{r['name']}": r["c"] for r in rows}
+        tr.append({"vertex": vid, "name": w, "df": (rows[0]["df"] if rows else 0) + 1, "ntasks": 0})
+        for t in tools:
+            ur.append({"source_vertex": vid, "destination_vertex": nid(t),
+                       "relationship_vertex": nid(f"u{uid}:{w}->{t}"), "count": cur.get(t, 0) + 1})
+    db.batches("UNWIND $rows AS row MERGE (n {id: row.vertex}) "
+               "SET n:Term, n.name = row.name, n.df = row.df, n.ntasks = row.ntasks", tr)
+    db.batches("UNWIND $rows AS row MATCH (s:Term {id: row.source_vertex}), (d:Tool {id: row.destination_vertex}) "
+               "MERGE (s)-[r:USED_FOR {id: row.relationship_vertex}]->(d) SET r.count = row.count", ur)
+
+
+def user_select(uid, task, k=5):
+    import traverse as tv
+    from collections import Counter
+    n_u = journal.count(uid)
+
+    def ft(w):
+        base = tv.db.fetch_term(w)
+        mine = tv.db.run(PQ % nid(f"u{uid}:term:{w}"))
+        if not mine:
+            return base
+        c = Counter()
+        for r in base + mine:
+            c[(r["server"], r["name"])] += r["c"]
+        df = (base[0]["df"] if base else 0) + mine[0]["df"]
+        return [{"server": s, "name": n, "c": v, "df": df, "ntasks": _state()["nt"] + n_u} for (s, n), v in c.items()]
+
+    sel = lg.Selector(ft, tv.sel.fetch_follow, tv.catalog, tv.sel.bm25)
+    t0 = time.perf_counter()
+    tools, info = sel.select(task, k)
+    return tools, info, round((time.perf_counter() - t0) * 1000, 1)
+
+
+def teach_user(uid, task, tools):
+    import traverse as tv
+    task, tools, terms = clean(task, tools, {t["id"] for t in tv.catalog})
+    with LOCK:
+        if journal.count(uid) >= 200:
+            raise RuntimeError("workspace lesson limit reached (200)")
+        before = [t["id"] for t in user_select(uid, task)[0]]
+        journal.add(task, tools, uid)
+        apply_user(tv.db, uid, task, tools, terms)
+        return {"before": before, "after": [t["id"] for t in user_select(uid, task)[0]], "persisted": True}

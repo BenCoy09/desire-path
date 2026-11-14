@@ -23,13 +23,16 @@ try:
         journal.init()
         ids = {t["id"] for t in lg.load_catalog()}
         db = lg.Hydra()
-        for task, tools in journal.all_lessons():
+        for uid, task, tools in journal.all_lessons():
             try:
                 task, tools, terms = learn.clean(task, tools, ids)
             except ValueError:
                 continue
-            learn.apply(db, nt + 1, task, tools, terms)
-            nt += 1
+            if uid is None:
+                learn.apply(db, nt + 1, task, tools, terms)
+                nt += 1
+            else:
+                learn.apply_user(db, uid, task, tools, terms)
             replayed += 1
         if replayed:
             learn.set_ntasks(db, nt)

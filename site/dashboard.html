@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: workspace</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
+<nav><div class="wrap"><a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a><a href="docs.html">Docs</a><span class="mut" id="who"></span><button class="btn" id="out">Log out</button></div></nav>
+<main class="wrap" style="max-width:760px;padding-top:24px"><h1 style="font-size:34px">Your workspace</h1>
+<p class="mut" id="sub">Loading...</p>
+<div class="card"><h3>1. Route a task</h3><input id="task" value="read the config file and write a summary to notes.txt"><button class="btn pri" id="go" style="margin-top:10px">Route</button><p class="mut" id="rm"></p><div id="rb"></div></div>
+<div class="card" style="margin-top:14px"><h3>2. Teach your graph</h3><p class="mut">Tap the tools this task really needed, in order. Only your routing changes.</p><div id="tl"></div><p class="mut" id="pk">Picked: none</p><button class="btn pri" id="tb">Teach</button><p class="mut" id="tm"></p></div>
+<div class="card" style="margin-top:14px"><h3>3. Your lessons</h3><div id="ls" class="mut">None yet</div></div></main>
+<script>
+var $=function(i){return document.getElementById(i)},picked=[];
+function j(u,o){return fetch(u,o).then(function(r){return r.json().then(function(d){d._s=r.status;return d})})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function list(box,ids){box.textContent="";ids.forEach(function(t,i){var c=el("div","row");c.appendChild(el("b",null,(i+1)+". "+t.replace("__"," / ")));box.appendChild(c)})}
+function lessons(){j("/my/lessons").then(function(d){var b=$("ls");if(!d.lessons||!d.lessons.length){b.textContent="None yet";return}b.textContent="";
+d.lessons.forEach(function(l){var c=el("div","row");c.appendChild(el("b",null,l.task));c.appendChild(el("div","mut",l.tools.join(" > ")+"  ("+l.at+")"));b.appendChild(c)})})}
+j("/me").then(function(d){if(d._s!==200){location="account.html#login";return}$("who").textContent=d.email;$("sub").textContent="A private graph on top of the shared base. "+d.lessons+" lessons so, far, saved in your account.";lessons()});
+$("out").onclick=function(){fetch("/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(function(){location="index.html"})};
+$("go").onclick=function(){$("rm").textContent="Traversing...";$("rb").textContent="";j("/my/select?k=5&task="+encodeURIComponent($("task").value)).then(function(d){
+if(d.error){$("rm").textContent=d.error;return}if(d.no_confident_match){$("rm").textContent="No confident match. Teach it.";return}
+$("rm").textContent=d.tools.length+" tools in "+d.traversal_ms+" ms";list($("rb"),d.tools.map(function(t){return t.server+"__"+t.name}))})};
+j("/tools").then(function(d){d.tools.forEach(function(t){var b=el("button",null,t);b.onclick=function(){var i=picked.indexOf(t);if(i<0){picked.push(t);b.className="on"}else{picked.splice(i,1);b.className=""}$("pk").textContent="Picked: "+(picked.join(" > ")||"none")};$("tl").appendChild(b)})});
+$("tb").onclick=function(){$("tm").textContent="Saving...";j("/my/learn",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:$("task").value,tools:picked})}).then(function(d){
+if(d.error){$("tm").textContent=d.error;return}$("tm").textContent="Saved. Route the task again to see it change.";lessons()})};
+</script></body></html>

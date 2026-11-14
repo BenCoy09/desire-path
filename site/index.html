@@ -23,9 +23,10 @@
 
 <section><div class="wrap"><h2>Measured live</h2><div class="grid" id="st"></div>
 <div class="card" style="margin-top:14px"><h3>Savings estimate</h3>
-<p class="mut">Calls per day</p><input id="cd" type="number" value="10000">
+<p class="mut">Agent tasks per day</p><input id="cd" type="number" value="10000">
 <p class="mut">Price per 1M input tokens ($), edit to match your model</p><input id="pp" type="number" value="3" step="0.1">
 <p id="sv"></p><p class="mut" style="font-size:14px">Assumes each call would otherwise carry the whole tool catalog.</p></div></div></section>
+<section><div class="wrap"><h2>Real agent runs</h2><p class="mut">Gemini agents using real MCP tools, success checked by code. Ten held-out tasks, one run each.</p><div class="card"><table id="real"></table></div></div></section>
 <section id="how"><div class="wrap"><h2>How it works</h2><div class="grid">
 <div class="card"><h3>1. Learn</h3><p class="mut">Successful runs become edges in HydraDB: task words point to the tools that were needed, and tools point to the ones that usually come next.</p></div>
 <div class="card"><h3>2. Traverse</h3><p class="mut">A new task walks those edges in milliseconds. No model call, and only the matching tool definitions go into the prompt.</p></div>
@@ -69,11 +70,21 @@ var box=document.getElementById("ks");ks.forEach(function(k){var b=document.crea
 draw(ks.indexOf(5)>=0?5:ks[0])}).catch(function(){document.getElementById("lg").textContent="Chart unavailable"});
 var EV=null;
 function pick(m,k){return EV.rows.filter(function(x){return x.method===m&&x.k===k})[0]}
+function PRE(e){return e.measured&&e.measured.preload?e.measured.preload.prompt_tokens:e.preload_tokens}
+function GR(e,g){return e.measured&&e.measured.graph_5?e.measured.graph_5.prompt_tokens:g.tokens}
 function calc(){if(!EV)return;var g=pick("graph",5),c=+document.getElementById("cd").value||0,p=+document.getElementById("pp").value||0;
-document.getElementById("sv").textContent="About $"+Math.round(c*30*(EV.preload_tokens-g.tokens)/1e6*p).toLocaleString()+" per month saved on input tokens, at "+Math.round(100*g.recall)+"% recall of needed tools (loading everything is 100%)."}
+document.getElementById("sv").textContent="About $"+Math.round(c*30*(PRE(EV)-GR(EV,g))/1e6*p).toLocaleString()+" per month saved on input tokens, at "+Math.round(100*g.recall)+"% recall of needed tools (loading everything is 100%)."}
 fetch("/eval").then(function(r){return r.json()}).then(function(d){if(!d.rows)return;EV=d;
 var g=pick("graph",5),b=pick("keyword baseline (BM25)",5),f=pick("graph without sequence edges",5),st=document.getElementById("st");
-[["Tokens per call",g.tokens+" vs "+d.preload_tokens,"graph vs loading every tool"],["Recall, 5 tools",g.recall+" vs "+b.recall,"graph vs keyword baseline"],["Sequence edges",g.recall+" vs "+f.recall,"graph vs graph without them"]].forEach(function(x){
+[(d.measured&&d.measured.graph_5&&d.measured.preload?["Prompt tokens per task, measured",d.measured.graph_5.prompt_tokens.toLocaleString()+" vs "+d.measured.preload.prompt_tokens.toLocaleString(),"graph with 5 tools vs loading all 42, real Gemini runs"]:["Tokens per call (estimate)",g.tokens+" vs "+d.preload_tokens,"graph vs loading every tool"]),["Recall, 5 tools",g.recall+" vs "+b.recall,"graph vs keyword baseline"],["Sequence edges",g.recall+" vs "+f.recall,"graph vs graph without them"]].forEach(function(x){
 var c=document.createElement("div");c.className="card";c.innerHTML="<div class='mut'>"+x[0]+"</div><h3>"+x[1]+"</h3><div class='mut' style='font-size:14px'>"+x[2]+"</div>";st.appendChild(c)});calc()}).catch(function(){});
 document.getElementById("cd").oninput=calc;document.getElementById("pp").oninput=calc;
+fetch("/eval").then(function(r){return r.json()}).then(function(d){var m=d.measured,t=document.getElementById("real");if(!m||!t)return;
+var rows=[["preload","Load all 42 tools"],["bm25_top5","Keyword search, 5 tools"],["bm25_top3","Keyword search, 3 tools"],["graph_5","desire-path graph, 5 tools"]],
+h="<tr><th style='text-align:left'>Method</th><th>Passed</th><th>Prompt tokens per task</th><th>LLM calls</th></tr>";
+rows.forEach(function(r){var x=m[r[0]];if(x)h+="<tr><td style='text-align:left'>"+r[1]+"</td><td>"+x.passed+"/"+x.n+"</td><td>"+x.prompt_tokens.toLocaleString()+"</td><td>"+x.llm_calls+"</td></tr>"});
+t.innerHTML=h}).catch(function(){});
+fetch("/curve").then(function(r){return r.json()}).then(function(c){var g=c.filter(function(x){return x.k===5&&x.method==="graph"}).sort(function(a,b){return a.n-b.n});
+var st=document.getElementById("st");if(g.length<2||!st)return;var a=g[0],z=g[g.length-1],d=document.createElement("div");d.className="card";
+d.innerHTML="<div class='mut'>Recall as it learns</div><h3>"+a.recall.toFixed(2)+" to "+z.recall.toFixed(2)+"</h3><div class='mut' style='font-size:14px'>from "+a.n+" to "+z.n+" learned tasks, 5 tools, offline check</div>";st.appendChild(d)}).catch(function(){});
 </script></body></html>

@@ -47,6 +47,23 @@ def run_bench():
     return rows
 
 
+FB = {"selects": 0, "fallbacks": 0}
+_reply = tv.H.reply
+
+
+def _fb_reply(self, code, obj):
+    if isinstance(obj, dict) and "traversal_ms" in obj and "tools" in obj:
+        FB["selects"] += 1
+        if obj.get("no_confident_match"):
+            FB["fallbacks"] += 1
+            obj["fallback"] = "load_full_catalog"
+            obj["catalog_size"] = len(tv.catalog)
+    return _reply(self, code, obj)
+
+
+tv.H.reply = _fb_reply
+
+
 class Hosted(tv.H):
     def do_GET(self):
         u = urlparse(self.path)
@@ -55,7 +72,7 @@ class Hosted(tv.H):
         if u.path in ("/select", "/health"):
             return super().do_GET()
         if u.path == "/status":
-            return self.reply(200, learn.status())
+            return self.reply(200, dict(learn.status(), selects=FB["selects"], fallbacks=FB["fallbacks"]))
         if u.path == "/eval":
             if not EVAL_LOCK.acquire(blocking=False):
                 return self.reply(429, {"error": "evaluation already running"})

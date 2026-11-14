@@ -6,6 +6,23 @@ TESTS = []
 CACHE = [0, None]
 
 
+def measured():
+    traces = [json.loads(l) for l in lg.TRACES.read_text().splitlines() if l.strip()]
+    out = {}
+    for label, method in (("preload", "preload"), ("bm25_top5", "bm25_top5"), ("bm25_top3", "bm25_top3"), ("graph_5", "graph_5_N100")):
+        last = {}
+        for r in traces:
+            if r.get("method") == method and r.get("split") == "test" and not r.get("error"):
+                last[r["task_id"]] = r
+        if last:
+            rs = list(last.values())
+            n = len(rs)
+            out[label] = {"passed": sum(bool(r["success"]) for r in rs), "n": n,
+                          "prompt_tokens": round(sum(r["prompt_tokens"] for r in rs) / n),
+                          "llm_calls": round(sum(r["llm_calls"] for r in rs) / n, 1)}
+    return out
+
+
 def run(ks=(3, 5)):
     import traverse as tv
     if CACHE[1] and time.time() - CACHE[0] < 30:
@@ -37,6 +54,6 @@ def run(ks=(3, 5)):
             n = len(TESTS)
             rows.append({"method": name, "k": k, "recall": round(rec / n, 2), "precision": round(prec / n, 2),
                          "all_found": round(full / n, 2), "tokens": round(tok / n)})
-    out = {"tasks": len(TESTS), "preload_tokens": sum(chars.values()) // 4, "rows": rows}
+    out = {"tasks": len(TESTS), "preload_tokens": sum(chars.values()) // 4, "rows": rows, "measured": measured()}
     CACHE[0], CACHE[1] = time.time(), out
     return out

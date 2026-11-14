@@ -14,7 +14,7 @@
 <div id="v-route"><p class="mut">Describe a task. The graph picks the tools.</p>
 <input id="task" value="read the config file and write a summary to notes.txt">
 <button class="btn pri" id="go" style="margin-top:10px">Route task</button>
-<p class="mut" id="rmeta"></p><div id="rbox"></div></div>
+<p class="mut" id="rmeta"></p><div id="rbox"></div><div id="fb" hidden><p class="mut">Were these the right tools?</p><button class="btn pri" id="fy">Yes, teach this</button><button class="btn" id="fn">No, I will pick them</button><p class="mut" id="fm"></p></div></div>
 
 <div id="v-teach" hidden><p class="mut">Uses the task from the Route tab. Tap the tools it really needed, in order, then teach. Route again to see the change.</p>
 <div id="tl"></div><p class="mut" id="picked">Picked: none</p>
@@ -39,12 +39,12 @@ function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null
 function view(){var v=(location.hash||"#route").slice(1);["route","teach","eval","bench","settings"].forEach(function(n){$("v-"+n).hidden=n!==v;$("t-"+n).className=n===v?"tab on":"tab"})}
 addEventListener("hashchange",view);view();
 function list(box,ids){box.textContent="";ids.forEach(function(t,i){var p=t.split("__"),c=el("div","row");c.appendChild(el("b",null,(i+1)+". "+p.slice(1).join("__")));c.appendChild(el("span","mut","  "+p[0]));box.appendChild(c)})}
-$("go").onclick=function(){var m=$("rmeta");m.textContent="Traversing the graph...";$("rbox").textContent="";
+$("go").onclick=function(){var m=$("rmeta");m.textContent="Traversing the graph...";$("rbox").textContent="";$("fb").hidden=true;
 j("/select?k="+K+"&task="+encodeURIComponent($("task").value)).then(function(d){
 if(d.error){m.textContent=d.error;return}
 if(d.no_confident_match){m.textContent="No confident match ("+d.traversal_ms+" ms). Use more specific words, or teach it.";return}
 m.textContent=d.tools.length+" tools in "+d.traversal_ms+" ms, from HydraDB";
-list($("rbox"),d.tools.map(function(t){return t.server+"__"+t.name}))}).catch(function(){m.textContent="Server unreachable"})};
+list($("rbox"),d.tools.map(function(t){return t.server+"__"+t.name}));LAST=d.tools.map(function(t){return t.server+"__"+t.name});$("fb").hidden=false}).catch(function(){m.textContent="Server unreachable"})};
 j("/tools").then(function(d){d.tools.forEach(function(t){var b=el("button",null,t);
 b.onclick=function(){var i=picked.indexOf(t);if(i<0){picked.push(t);b.className="on"}else{picked.splice(i,1);b.className=""}
 $("picked").textContent="Picked: "+(picked.join(" > ")||"none")};$("tl").appendChild(b)})});
@@ -65,7 +65,10 @@ $("ckv").textContent=DP.get("cookies")||"not chosen";
 $("ckr").onclick=function(){try{localStorage.removeItem("cookies")}catch(e){}location.reload()};
 $("egob").onclick=function(){var o=$("eout");o.textContent="Running held-out tasks...";
 j("/eval").then(function(d){if(!d.rows){o.textContent=d.error||"Failed";return}
-var h="<p class='mut'>"+d.tasks+" held-out tasks. Loading every tool: recall 1.00, about "+d.preload_tokens+" tokens per call.</p><table><tr><th style='text-align:left'>method</th><th>k</th><th>recall</th><th>precision</th><th>all found</th><th>tokens</th></tr>";
+var h="<p class='mut'>"+d.tasks+" held-out tasks. Loading every tool: recall 1.00, an estimated "+d.preload_tokens+" tokens of definitions per call (characters divided by 4; measured token counts are on the home page).</p><table><tr><th style='text-align:left'>method</th><th>k</th><th>recall</th><th>precision</th><th>all found</th><th>est. tokens</th></tr>";
 d.rows.forEach(function(r){h+="<tr><td style='text-align:left'>"+r.method+"</td><td>"+r.k+"</td><td>"+r.recall+"</td><td>"+r.precision+"</td><td>"+r.all_found+"</td><td>"+r.tokens+"</td></tr>"});
 o.innerHTML=h+"</table>"}).catch(function(){o.textContent="Server unreachable"})};
+var LAST=[];
+$("fy").onclick=function(){var m=$("fm");m.textContent="Saving...";j("/learn",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:$("task").value,tools:LAST})}).then(function(d){m.textContent=d.error?d.error:"Taught. Route the task again to see the change."}).catch(function(){m.textContent="Server unreachable"})};
+$("fn").onclick=function(){location.hash="#teach"};
 </script></body></html>

@@ -62,6 +62,16 @@ def _limit(ip):
 
 
 def _mail(to, link):
+    relay = os.environ.get("MAIL_RELAY_URL")
+    if relay:
+        body = json.dumps({"secret": os.environ.get("MAIL_RELAY_SECRET", ""), "to": to,
+                           "subject": "Verify your Desire Path account",
+                           "html": f'<p>Welcome to Desire Path.</p><p><a href="{link}">Verify your email</a> (valid 24 hours).</p>'}).encode()
+        try:
+            r = urllib.request.urlopen(urllib.request.Request(relay, body, {"Content-Type": "application/json"}), timeout=20)
+            return "denied" not in r.read().decode()
+        except Exception:
+            return False
     key, sender = os.environ.get("BREVO_API_KEY"), os.environ.get("MAIL_FROM")
     if not key or not sender:
         return False
@@ -112,7 +122,7 @@ def _route(h, m, p, q, b):
             link = f"{PUBLIC or 'https://' + h.headers.get('Host', '')}/auth/verify?token={_tok(uid, 'verify', 24)}"
             sent = _mail(email, link)
             out = {"ok": True, "emailed": sent}
-            if not os.environ.get("BREVO_API_KEY"):
+            if not (os.environ.get("BREVO_API_KEY") or os.environ.get("MAIL_RELAY_URL")):
                 out["demo_link"] = link
             return _send(h, 200, out)
         row = journal.q("SELECT id, pw, verified FROM users WHERE email=%s", (email,), one=True)

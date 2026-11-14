@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Desire Path: agents that learn which tools they need</title>
 <meta name="description" content="Tool routing for AI agents. A graph in HydraDB learns which tools tasks really use, so agents load only what they need.">
@@ -41,10 +41,14 @@
 <div class="card"><h3>Enterprise</h3><p><b>Let's talk</b></p><p class="mut">Private deployment, audit trail, custom tool catalogs.</p><a class="btn" href="https://github.com/BenCoy09/desire-path/issues">Contact</a></div></div></div></section>
 
 <section id="faq"><div class="wrap"><h2>FAQ</h2>
-<details><summary>Does it call an LLM to pick tools?</summary><p>No. Routing is graph traversal in HydraDB. The only model calls are in your own agent.</p></details>
-<details><summary>Why a graph and not a plain store?</summary><p>The sequence edges (this tool usually follows that one) are traversals. A flat keyword store cannot follow them.</p></details>
-<details><summary>Is the demo saved forever?</summary><p>Lessons are saved to a database and replayed into HydraDB on every restart. They are shared by all visitors and rate-limited.</p></details>
-<details><summary>What do you store about me?</summary><p>Only settings in your own browser. No tracking runs today. Analytics stay off unless you allow them.</p></details>
+<details><summary>What is Desire Path?</summary><p>A routing layer for AI agents. It learns which tools tasks really use and finds them with a graph walk in HydraDB, so your agent loads a handful of tool definitions instead of all of them.</p></details>
+<details><summary>Does it call an LLM to pick tools?</summary><p>No. Routing is graph traversal in HydraDB with no model call. The only model calls are in your own agent.</p></details>
+<details><summary>How much does it save?</summary><p>On our 10 held-out test tasks it finds about 97% of the tools a task needs while sending roughly 1,600 tokens instead of about 16,000. That is a small test set, so treat it as early evidence. The live numbers are in the Measured live section above.</p></details>
+<details><summary>Can I try it without signing up?</summary><p>Yes. Use Try the demo on the sign-in page for a private, temporary workspace. No email needed.</p></details>
+<details><summary>Is my workspace private?</summary><p>Yes. Lessons you teach inside your workspace only change your own routing. The public app page is a shared demo, so lessons taught there are visible to everyone.</p></details>
+<details><summary>What do you store about me?</summary><p>Your email, a password hash (never the password itself) and your lessons. We run no analytics. Cookies: one login session cookie, plus your own display settings.</p></details>
+<details><summary>Can I bring my own tools?</summary><p>Not yet. The demo uses a fixed catalog from four MCP servers. Custom catalogs are the next thing we plan to build.</p></details>
+<details><summary>Is this production ready?</summary><p>It is an early demo on a free host. The first visit after a quiet spell can take about a minute to wake, and there is no uptime guarantee. Prices shown are proposed.</p></details>
 <details><summary>Can I run it myself?</summary><p>Yes. The code is open source and uses the open-source HydraDB engine.</p></details></div></section>
 
 <footer><div class="wrap">Desire Path, built for the HydraDB hackathon. <a href="https://github.com/BenCoy09/desire-path">GitHub</a> · <a href="explore.html">Graph explorer</a> · <a href="app.html#settings">Cookie settings</a></div></footer>

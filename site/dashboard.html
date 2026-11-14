@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: workspace</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: workspace</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
 <nav><div class="wrap"><a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a><a href="docs.html">Docs</a><span class="mut" id="who"></span><button class="btn" id="out">Log out</button></div></nav>
@@ -14,7 +14,7 @@ function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null
 function list(box,ids){box.textContent="";ids.forEach(function(t,i){var c=el("div","row");c.appendChild(el("b",null,(i+1)+". "+t.replace("__"," / ")));box.appendChild(c)})}
 function lessons(){j("/my/lessons").then(function(d){var b=$("ls");if(!d.lessons||!d.lessons.length){b.textContent="None yet";return}b.textContent="";
 d.lessons.forEach(function(l){var c=el("div","row");c.appendChild(el("b",null,l.task));c.appendChild(el("div","mut",l.tools.join(" > ")+"  ("+l.at+")"));b.appendChild(c)})})}
-j("/me").then(function(d){if(d._s!==200){location="account.html#login";return}$("who").textContent=d.email.endsWith("@demo.invalid")?"Demo workspace":d.email;$("sub").textContent="A private graph on top of the shared base. "+d.lessons+" lessons so, far, saved in your account.";lessons()});
+j("/me").then(function(d){if(d._s!==200){location="account.html#login";return}var dm=d.email.endsWith("@demo.invalid");$("who").textContent=dm?"D":d.email.charAt(0).toUpperCase();$("who").className="avatar";$("who").title=dm?"Demo workspace":"Your account";$("sub").textContent="A private graph on top of the shared base. "+d.lessons+" lessons saved to your account.";lessons()});
 $("out").onclick=function(){fetch("/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(function(){location="index.html"})};
 $("go").onclick=function(){$("rm").textContent="Traversing...";$("rb").textContent="";j("/my/select?k=5&task="+encodeURIComponent($("task").value)).then(function(d){
 if(d.error){$("rm").textContent=d.error;return}if(d.no_confident_match){$("rm").textContent="No confident match. Teach it.";return}

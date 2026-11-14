@@ -32,3 +32,4 @@ input,select{width:100%;padding:11px;font:inherit;border:1px solid var(--bd);bor
 #tl{max-height:200px;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:4px;background:var(--card)}
 #tl button{font:13px inherit;margin:3px;padding:5px 9px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}#tl button.on{background:var(--ac);border-color:var(--ac);color:#fff}
 table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--bd);padding:6px;text-align:right}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--ac);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none}

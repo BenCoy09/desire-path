@@ -69,8 +69,12 @@ def _mail(to, link):
                            "html": f'<p>Welcome to Desire Path.</p><p><a href="{link}">Verify your email</a> (valid 24 hours).</p>'}).encode()
         try:
             r = urllib.request.urlopen(urllib.request.Request(relay, body, {"Content-Type": "application/json"}), timeout=20)
-            return "denied" not in r.read().decode()
-        except Exception:
+            ok = "denied" not in r.read().decode()
+            if not ok:
+                print("mail relay: secret mismatch", flush=True)
+            return ok
+        except Exception as e:
+            print("mail relay error:", type(e).__name__, str(e)[:200], flush=True)
             return False
     key, sender = os.environ.get("BREVO_API_KEY"), os.environ.get("MAIL_FROM")
     if not key or not sender:
@@ -103,6 +107,12 @@ def _send(h, code, obj=None, cookie=None, loc=None):
 def _route(h, m, p, q, b):
     if not journal.enabled():
         raise RuntimeError("accounts need the database (DATABASE_URL)")
+    if m == "POST" and p == "/auth/demo":
+        _limit(_ip(h))
+        email = f"demo-{secrets.token_hex(4)}@demo.invalid"
+        uid = journal.q("INSERT INTO users (email, pw, verified) VALUES (%s, %s, true) RETURNING id",
+                        (email, _hash(secrets.token_hex(16))), one=True)[0]
+        return _send(h, 200, {"ok": True}, cookie=_cookie(_tok(uid, "session", 24), 86400))
     if m == "POST" and p in ("/auth/signup", "/auth/login"):
         _limit(_ip(h))
         email, pw = str(b.get("email", "")).strip().lower(), str(b.get("password", ""))

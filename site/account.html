@@ -7,7 +7,8 @@
 <h1 style="font-size:32px">Your own workspace</h1><p class="mut">A private graph that learns from your tasks.</p>
 <div class="tabs"><a class="tab on" id="ts" href="#signup">Sign up</a><a class="tab" id="tl" href="#login">Log in</a></div>
 <div class="card"><p><label>Email</label><input id="em" type="email" autocomplete="email"></p><p><label>Password (8+ characters)</label><input id="pw" type="password" autocomplete="current-password"></p>
-<button class="btn pri" id="go">Create account</button><p id="msg" class="mut"></p></div></main>
+<button class="btn pri" id="go">Create account</button><p id="msg" class="mut"></p></div>
+<p style="margin-top:16px"><button class="btn" id="demo">Try the demo, no signup</button></p><p class="mut" style="font-size:14px">Judges: this gives you a private temporary workspace, no email needed.</p></main>
 <script>
 var $=function(i){return document.getElementById(i)},mode="signup";
 function view(){mode=location.hash==="#login"?"login":"signup";$("ts").className=mode==="signup"?"tab on":"tab";$("tl").className=mode==="login"?"tab on":"tab";$("go").textContent=mode==="signup"?"Create account":"Log in"}
@@ -19,4 +20,5 @@ if(mode==="login"){location="dashboard.html";return}
 m.textContent="";
 if(d.demo_link){var a=document.createElement("a");a.href=d.demo_link;a.textContent="Verify my email";m.append("Demo mode: email sending is not set up on this server. ",a)}
 else m.textContent=d.emailed?"Check your inbox (and spam) for the verification link.":"We could not send the email. Try again later."}).catch(function(){m.textContent="Server unreachable"})};
+$("demo").onclick=function(){$("msg").textContent="Creating demo workspace...";fetch("/auth/demo",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(function(r){return r.json()}).then(function(d){if(d.error){$("msg").textContent=d.error;return}location="dashboard.html"}).catch(function(){$("msg").textContent="Server unreachable"})};
 </script></body></html>

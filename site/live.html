@@ -1,0 +1,61 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desire Path: live on HydraDB</title>
+<style>
+:root{--bg:#fff;--fg:#111;--mut:#666;--ac:#2447f5;--bd:#ddd}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--fg:#eee;--mut:#999;--bd:#333}}
+body{font:16px system-ui,sans-serif;margin:0 auto;max-width:720px;padding:16px;background:var(--bg);color:var(--fg)}
+h2{margin:28px 0 8px}p.m{color:var(--mut);margin:4px 0}
+input{width:100%;box-sizing:border-box;padding:10px;font:inherit;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}
+button{padding:8px 12px;margin:6px 6px 0 0;font:inherit;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}
+button.go{background:var(--ac);color:#fff;border-color:var(--ac)}button.on{border-color:var(--ac);background:var(--ac);color:#fff}
+#tl{max-height:180px;overflow:auto;border:1px solid var(--bd);border-radius:8px;padding:4px}
+#tl button{font-size:13px;padding:4px 8px}
+pre{white-space:pre-wrap;word-break:break-word;background:rgba(127,127,127,.12);padding:10px;border-radius:8px;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--bd);padding:4px;text-align:right}
+</style>
+<h1>Desire Path, live</h1>
+<p class="m">Tool routing by graph traversal in a self-hosted HydraDB. No LLM call.</p>
+
+<h2>1. Route a task</h2>
+<input id="task" value="read the config file and write a summary to notes.txt">
+<button class="go" id="route">Route</button>
+<pre id="out">-</pre>
+
+<h2>2. Teach it</h2>
+<p class="m">Tap the tools this task needed, in order, then teach. Route the same task again to see it change. Writes reset when the server restarts.</p>
+<div id="tl"></div>
+<p class="m" id="picked">Picked: none</p>
+<button class="go" id="teach">Teach</button>
+<pre id="tout">-</pre>
+
+<h2>3. Benchmark</h2>
+<p class="m">100 requests at 1, 5 and 20 concurrent, every one traversing the graph (no cache). One run at a time.</p>
+<button class="go" id="bench">Run benchmark</button>
+<div id="bout"></div>
+
+<script>
+var $=function(i){return document.getElementById(i)},picked=[];
+function show(el,o){el.textContent=typeof o==="string"?o:JSON.stringify(o,null,1)}
+function j(u,o){return fetch(u,o).then(function(r){return r.json()})}
+$("route").onclick=function(){
+  show($("out"),"routing...");
+  j("/select?k=5&task="+encodeURIComponent($("task").value)).then(function(d){show($("out"),d)}).catch(function(e){show($("out"),"error: "+e)})};
+j("/tools").then(function(d){d.tools.forEach(function(t){
+  var b=document.createElement("button");b.textContent=t;
+  b.onclick=function(){var i=picked.indexOf(t);if(i<0){picked.push(t);b.className="on"}else{picked.splice(i,1);b.className=""}
+    $("picked").textContent="Picked: "+(picked.join(" -> ")||"none")};
+  $("tl").appendChild(b)})});
+$("teach").onclick=function(){
+  show($("tout"),"writing to HydraDB...");
+  j("/learn",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:$("task").value,tools:picked})})
+   .then(function(d){show($("tout"),d)}).catch(function(e){show($("tout"),"error: "+e)})};
+$("bench").onclick=function(){
+  var o=$("bout");o.textContent="running (about 10 to 60 s)...";
+  j("/bench").then(function(d){
+    if(!d.rows){o.textContent=d.error||"failed";return}
+    var h="<table><tr><th>conc</th><th>ok</th><th>rps</th><th>p50 ms</th><th>p95 ms</th><th>p99 ms</th></tr>";
+    d.rows.forEach(function(r){h+="<tr><td>"+r.concurrency+"</td><td>"+r.ok+"/"+r.requests+"</td><td>"+r.rps+"</td><td>"+r.p50_ms+"</td><td>"+r.p95_ms+"</td><td>"+r.p99_ms+"</td></tr>"});
+    o.innerHTML=h+"</table><p class='m'>"+d.note+"</p>"}).catch(function(e){o.textContent="error: "+e})};
+</script>

@@ -7,6 +7,7 @@ common.patch()
 import traverse as tv                      # connects to HydraDB, builds the selector
 from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer
+import learn
 from urllib.parse import urlparse
 
 SITE = common.ROOT / "site"
@@ -50,6 +51,8 @@ class Hosted(tv.H):
         u = urlparse(self.path)
         if u.path in ("/select", "/health"):
             return super().do_GET()
+        if u.path == "/tools":
+            return self.reply(200, {"tools": learn.tool_ids()})
         if u.path == "/bench":
             return self.bench()
         if u.path == "/curve":
@@ -59,6 +62,22 @@ class Hosted(tv.H):
         if SITE.resolve() not in p.parents and p != SITE.resolve():
             return self.reply(404, {"error": "not found"})
         return self.file(p)
+
+    def do_POST(self):
+        if urlparse(self.path).path != "/learn":
+            return self.reply(404, {"error": "not found"})
+        try:
+            n = int(self.headers.get("Content-Length", 0))
+            if n > 20000:
+                raise ValueError("body too large")
+            body = json.loads(self.rfile.read(n) or b"{}")
+            return self.reply(200, learn.teach(body.get("task", ""), body.get("tools") or []))
+        except ValueError as e:
+            return self.reply(400, {"error": str(e)})
+        except RuntimeError as e:
+            return self.reply(429, {"error": str(e)})
+        except Exception as e:
+            return self.reply(503, {"error": "write failed: " + type(e).__name__ + " " + str(e)[:200]})
 
     def file(self, p):
         if not p.is_file():

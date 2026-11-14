@@ -1,0 +1,610 @@
+[
+ {
+  "n": 0,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.26666666666666666,
+  "recall_min": 0.26666666666666666,
+  "recall_max": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 0,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.26666666666666666,
+  "recall_min": 0.26666666666666666,
+  "recall_max": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 0,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.26666666666666666,
+  "recall_min": 0.26666666666666666,
+  "recall_max": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 0,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 2,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.3138888888888889,
+  "recall_min": 0.1,
+  "recall_max": 0.4833333333333333,
+  "all_found": 0.21333333333333335,
+  "tokens": 789.7466666666667
+ },
+ {
+  "n": 2,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.3138888888888889,
+  "recall_min": 0.1,
+  "recall_max": 0.4833333333333333,
+  "all_found": 0.21333333333333335,
+  "tokens": 779.34
+ },
+ {
+  "n": 2,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.31666666666666665,
+  "recall_min": 0.1,
+  "recall_max": 0.4833333333333333,
+  "all_found": 0.21333333333333335,
+  "tokens": 778.4633333333334
+ },
+ {
+  "n": 2,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 4,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.475,
+  "recall_min": 0.25,
+  "recall_max": 0.6833333333333333,
+  "all_found": 0.36666666666666664,
+  "tokens": 907.05
+ },
+ {
+  "n": 4,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.475,
+  "recall_min": 0.25,
+  "recall_max": 0.6833333333333333,
+  "all_found": 0.36666666666666664,
+  "tokens": 893.67
+ },
+ {
+  "n": 4,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.475,
+  "recall_min": 0.25,
+  "recall_max": 0.7166666666666667,
+  "all_found": 0.36666666666666664,
+  "tokens": 888.8566666666667
+ },
+ {
+  "n": 4,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 6,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.59,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.7666666666666667,
+  "all_found": 0.48333333333333334,
+  "tokens": 957.3566666666667
+ },
+ {
+  "n": 6,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.59,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.7666666666666667,
+  "all_found": 0.48333333333333334,
+  "tokens": 942.49
+ },
+ {
+  "n": 6,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.5794444444444444,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.7666666666666667,
+  "all_found": 0.47,
+  "tokens": 935.9300000000001
+ },
+ {
+  "n": 6,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 8,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.6994444444444444,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.59,
+  "tokens": 965.6366666666667
+ },
+ {
+  "n": 8,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.6994444444444444,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.59,
+  "tokens": 947.7933333333333
+ },
+ {
+  "n": 8,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.6844444444444444,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.5700000000000001,
+  "tokens": 939.4933333333333
+ },
+ {
+  "n": 8,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 12,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.8461111111111111,
+  "recall_min": 0.6666666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.73,
+  "tokens": 972.7233333333334
+ },
+ {
+  "n": 12,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.8461111111111111,
+  "recall_min": 0.6666666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.73,
+  "tokens": 954.88
+ },
+ {
+  "n": 12,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.8344444444444444,
+  "recall_min": 0.6666666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.7133333333333333,
+  "tokens": 951.8566666666667
+ },
+ {
+  "n": 12,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 16,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.9216666666666666,
+  "recall_min": 0.8166666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.8200000000000001,
+  "tokens": 1008.1666666666666
+ },
+ {
+  "n": 16,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.9216666666666666,
+  "recall_min": 0.8166666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.8200000000000001,
+  "tokens": 985.8466666666667
+ },
+ {
+  "n": 16,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.9216666666666666,
+  "recall_min": 0.8166666666666667,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.8200000000000001,
+  "tokens": 1002.6733333333334
+ },
+ {
+  "n": 16,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 20,
+  "k": 3,
+  "method": "graph",
+  "recall": 0.9666666666666666,
+  "recall_min": 0.9666666666666666,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.9,
+  "tokens": 1031.6
+ },
+ {
+  "n": 20,
+  "k": 3,
+  "method": "no-follow",
+  "recall": 0.9666666666666666,
+  "recall_min": 0.9666666666666666,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.9,
+  "tokens": 1031.6
+ },
+ {
+  "n": 20,
+  "k": 3,
+  "method": "plain-store",
+  "recall": 0.9666666666666666,
+  "recall_min": 0.9666666666666666,
+  "recall_max": 0.9666666666666666,
+  "all_found": 0.9,
+  "tokens": 1054.6533333333332
+ },
+ {
+  "n": 20,
+  "k": 3,
+  "method": "bm25",
+  "recall": 0.26666666666666666,
+  "all_found": 0.1,
+  "tokens": 1213.2
+ },
+ {
+  "n": 0,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.3,
+  "recall_min": 0.3,
+  "recall_max": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 0,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.3,
+  "recall_min": 0.3,
+  "recall_max": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 0,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.3,
+  "recall_min": 0.3,
+  "recall_max": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 0,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 2,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.3238888888888889,
+  "recall_min": 0.1,
+  "recall_max": 0.5166666666666667,
+  "all_found": 0.23,
+  "tokens": 963.62
+ },
+ {
+  "n": 2,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.3238888888888889,
+  "recall_min": 0.1,
+  "recall_max": 0.5166666666666667,
+  "all_found": 0.23,
+  "tokens": 953.2133333333334
+ },
+ {
+  "n": 2,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.3238888888888889,
+  "recall_min": 0.1,
+  "recall_max": 0.5166666666666667,
+  "all_found": 0.23,
+  "tokens": 953.2133333333334
+ },
+ {
+  "n": 2,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 4,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.49777777777777776,
+  "recall_min": 0.25,
+  "recall_max": 0.7166666666666667,
+  "all_found": 0.38333333333333336,
+  "tokens": 1116.9966666666667
+ },
+ {
+  "n": 4,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.49777777777777776,
+  "recall_min": 0.25,
+  "recall_max": 0.7166666666666667,
+  "all_found": 0.38333333333333336,
+  "tokens": 1092.6166666666666
+ },
+ {
+  "n": 4,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.4994444444444444,
+  "recall_min": 0.25,
+  "recall_max": 0.7166666666666667,
+  "all_found": 0.38333333333333336,
+  "tokens": 1092.3266666666668
+ },
+ {
+  "n": 4,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 6,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.635,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.5266666666666666,
+  "tokens": 1295.6399999999999
+ },
+ {
+  "n": 6,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.635,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.5266666666666666,
+  "tokens": 1261.5833333333333
+ },
+ {
+  "n": 6,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.6366666666666667,
+  "recall_min": 0.4333333333333333,
+  "recall_max": 0.85,
+  "all_found": 0.5233333333333333,
+  "tokens": 1260.3833333333334
+ },
+ {
+  "n": 6,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 8,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.7405555555555555,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.9,
+  "all_found": 0.6466666666666666,
+  "tokens": 1371.4933333333333
+ },
+ {
+  "n": 8,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.7422222222222222,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.9,
+  "all_found": 0.6466666666666666,
+  "tokens": 1336.7766666666669
+ },
+ {
+  "n": 8,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.7422222222222222,
+  "recall_min": 0.4833333333333333,
+  "recall_max": 0.9,
+  "all_found": 0.6433333333333333,
+  "tokens": 1337.6533333333332
+ },
+ {
+  "n": 8,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 12,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.8822222222222221,
+  "recall_min": 0.7166666666666667,
+  "recall_max": 1.0,
+  "all_found": 0.8166666666666667,
+  "tokens": 1522.6266666666668
+ },
+ {
+  "n": 12,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.8838888888888888,
+  "recall_min": 0.7166666666666667,
+  "recall_max": 1.0,
+  "all_found": 0.8166666666666667,
+  "tokens": 1469.0566666666666
+ },
+ {
+  "n": 12,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.8772222222222222,
+  "recall_min": 0.7166666666666667,
+  "recall_max": 1.0,
+  "all_found": 0.8066666666666666,
+  "tokens": 1469.5433333333335
+ },
+ {
+  "n": 12,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 16,
+  "k": 5,
+  "method": "graph",
+  "recall": 0.955,
+  "recall_min": 0.85,
+  "recall_max": 1.0,
+  "all_found": 0.92,
+  "tokens": 1595.6466666666668
+ },
+ {
+  "n": 16,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 0.955,
+  "recall_min": 0.85,
+  "recall_max": 1.0,
+  "all_found": 0.92,
+  "tokens": 1530.2333333333333
+ },
+ {
+  "n": 16,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 0.955,
+  "recall_min": 0.85,
+  "recall_max": 1.0,
+  "all_found": 0.92,
+  "tokens": 1541.46
+ },
+ {
+  "n": 16,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ },
+ {
+  "n": 20,
+  "k": 5,
+  "method": "graph",
+  "recall": 1.0,
+  "recall_min": 1.0,
+  "recall_max": 1.0,
+  "all_found": 1.0,
+  "tokens": 1633.6766666666667
+ },
+ {
+  "n": 20,
+  "k": 5,
+  "method": "no-follow",
+  "recall": 1.0,
+  "recall_min": 1.0,
+  "recall_max": 1.0,
+  "all_found": 1.0,
+  "tokens": 1563.7366666666667
+ },
+ {
+  "n": 20,
+  "k": 5,
+  "method": "plain-store",
+  "recall": 1.0,
+  "recall_min": 1.0,
+  "recall_max": 1.0,
+  "all_found": 1.0,
+  "tokens": 1603.47
+ },
+ {
+  "n": 20,
+  "k": 5,
+  "method": "bm25",
+  "recall": 0.3,
+  "all_found": 0.2,
+  "tokens": 1925.4
+ }
+]

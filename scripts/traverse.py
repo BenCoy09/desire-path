@@ -58,6 +58,8 @@ class H(BaseHTTPRequestHandler):
         except Exception as e:
             return self.reply(503, {"error": "graph unavailable: " + type(e).__name__})
         ms = round((time.perf_counter() - t0) * 1000, 1)
+        if info.get("fallback"):
+            return self.reply(200, {"tools": [], "no_confident_match": True, "info": info, "traversal_ms": ms})
         self.reply(200, {"tools": [{"name": t["name"], "server": t.get("server")} for t in tools],
                          "info": info, "traversal_ms": ms})
 

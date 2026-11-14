@@ -7,7 +7,8 @@ common.patch()
 import traverse as tv                      # connects to HydraDB, builds the selector
 from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer
-import learn
+import learn, evalrun
+EVAL_LOCK = threading.Lock()
 from urllib.parse import urlparse
 
 SITE = common.ROOT / "site"
@@ -51,6 +52,17 @@ class Hosted(tv.H):
         u = urlparse(self.path)
         if u.path in ("/select", "/health"):
             return super().do_GET()
+        if u.path == "/status":
+            return self.reply(200, learn.status())
+        if u.path == "/eval":
+            if not EVAL_LOCK.acquire(blocking=False):
+                return self.reply(429, {"error": "evaluation already running"})
+            try:
+                return self.reply(200, evalrun.run())
+            except Exception as e:
+                return self.reply(503, {"error": type(e).__name__ + " " + str(e)[:150]})
+            finally:
+                EVAL_LOCK.release()
         if u.path == "/tools":
             return self.reply(200, {"tools": learn.tool_ids()})
         if u.path == "/bench":
@@ -71,7 +83,7 @@ class Hosted(tv.H):
             if n > 20000:
                 raise ValueError("body too large")
             body = json.loads(self.rfile.read(n) or b"{}")
-            return self.reply(200, learn.teach(body.get("task", ""), body.get("tools") or []))
+            return self.reply(200, learn.teach(body.get("task", ""), body.get("tools") or [], (self.headers.get("X-Forwarded-For", "").split(",")[0].strip() or self.client_address[0])))
         except ValueError as e:
             return self.reply(400, {"error": str(e)})
         except RuntimeError as e:

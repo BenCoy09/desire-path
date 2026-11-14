@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
 <nav><div class="wrap">
 <a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a>
-<a href="#how">How it works</a><a href="#proof">Proof</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+<a href="#how">How it works</a><a href="#proof">Proof</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="docs.html">Docs</a>
 <a class="btn pri" href="app.html">Open the app</a></div></nav>
 
 <header class="wrap" style="padding:64px 20px 24px">
@@ -21,6 +21,11 @@
 <p class="mut" style="max-width:700px">Park designers know the pattern: people ignore the paved route and wear a dirt track along the shortcut they actually want. These are called desire paths, and some campuses now wait to see where people walk before laying any stone.</p>
 <p class="mut" style="max-width:700px">Agent tooling is still paved in advance, with every tool listed in every prompt. We do it the other way round. Let the agent walk, record which tools real tasks needed, and make those trails the map.</p></div></section>
 
+<section><div class="wrap"><h2>Measured live</h2><div class="grid" id="st"></div>
+<div class="card" style="margin-top:14px"><h3>Savings estimate</h3>
+<p class="mut">Calls per day</p><input id="cd" type="number" value="10000">
+<p class="mut">Price per 1M input tokens ($), edit to match your model</p><input id="pp" type="number" value="3" step="0.1">
+<p id="sv"></p><p class="mut" style="font-size:14px">Assumes each call would otherwise carry the whole tool catalog.</p></div></div></section>
 <section id="how"><div class="wrap"><h2>How it works</h2><div class="grid">
 <div class="card"><h3>1. Learn</h3><p class="mut">Successful runs become edges in HydraDB: task words point to the tools that were needed, and tools point to the ones that usually come next.</p></div>
 <div class="card"><h3>2. Traverse</h3><p class="mut">A new task walks those edges in milliseconds. No model call, and only the matching tool definitions go into the prompt.</p></div>
@@ -38,7 +43,7 @@
 <section id="faq"><div class="wrap"><h2>FAQ</h2>
 <details><summary>Does it call an LLM to pick tools?</summary><p>No. Routing is graph traversal in HydraDB. The only model calls are in your own agent.</p></details>
 <details><summary>Why a graph and not a plain store?</summary><p>The sequence edges (this tool usually follows that one) are traversals. A flat keyword store cannot follow them.</p></details>
-<details><summary>Is the demo saved forever?</summary><p>No. The hosted demo runs on a free instance, so what you teach it resets when the server restarts.</p></details>
+<details><summary>Is the demo saved forever?</summary><p>Lessons are saved to a database and replayed into HydraDB on every restart. They are shared by all visitors and rate-limited.</p></details>
 <details><summary>What do you store about me?</summary><p>Only settings in your own browser. No tracking runs today. Analytics stay off unless you allow them.</p></details>
 <details><summary>Can I run it myself?</summary><p>Yes. The code is open source and uses the open-source HydraDB engine.</p></details></div></section>
 
@@ -58,4 +63,13 @@ fetch("/curve").then(function(r){return r.json()}).then(function(d){D=d;
 var ks=[];d.forEach(function(x){if(ks.indexOf(x.k)<0)ks.push(x.k)});ks.sort(function(a,b){return a-b});
 var box=document.getElementById("ks");ks.forEach(function(k){var b=document.createElement("button");b.className="btn";b.textContent="k="+k;b.onclick=function(){draw(k)};box.appendChild(b)});
 draw(ks.indexOf(5)>=0?5:ks[0])}).catch(function(){document.getElementById("lg").textContent="Chart unavailable"});
+var EV=null;
+function pick(m,k){return EV.rows.filter(function(x){return x.method===m&&x.k===k})[0]}
+function calc(){if(!EV)return;var g=pick("graph",5),c=+document.getElementById("cd").value||0,p=+document.getElementById("pp").value||0;
+document.getElementById("sv").textContent="About $"+Math.round(c*30*(EV.preload_tokens-g.tokens)/1e6*p).toLocaleString()+" per month saved on input tokens, at "+Math.round(100*g.recall)+"% recall of needed tools (loading everything is 100%)."}
+fetch("/eval").then(function(r){return r.json()}).then(function(d){if(!d.rows)return;EV=d;
+var g=pick("graph",5),b=pick("keyword baseline (BM25)",5),f=pick("graph without sequence edges",5),st=document.getElementById("st");
+[["Tokens per call",g.tokens+" vs "+d.preload_tokens,"graph vs loading every tool"],["Recall, 5 tools",g.recall+" vs "+b.recall,"graph vs keyword baseline"],["Sequence edges",g.recall+" vs "+f.recall,"graph vs graph without them"]].forEach(function(x){
+var c=document.createElement("div");c.className="card";c.innerHTML="<div class='mut'>"+x[0]+"</div><h3>"+x[1]+"</h3><div class='mut' style='font-size:14px'>"+x[2]+"</div>";st.appendChild(c)});calc()}).catch(function(){});
+document.getElementById("cd").oninput=calc;document.getElementById("pp").oninput=calc;
 </script></body></html>

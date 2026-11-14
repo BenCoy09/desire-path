@@ -6,10 +6,10 @@
 <link rel="stylesheet" href="style.css"><script src="shared.js"></script></head><body>
 <nav><div class="wrap">
 <a class="brand" href="index.html"><svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>Desire Path</a>
-<a href="index.html#faq">FAQ</a><a href="explore.html">Graph explorer</a></div></nav>
+<a href="docs.html">Docs</a><a href="index.html#faq">FAQ</a><a href="explore.html">Graph explorer</a></div></nav>
 <main class="wrap" style="padding-top:24px;max-width:760px">
 <h1 style="font-size:34px">Route, teach, measure</h1>
-<div class="tabs"><a class="tab" id="t-route" href="#route">Route</a><a class="tab" id="t-teach" href="#teach">Teach</a><a class="tab" id="t-bench" href="#bench">Benchmark</a><a class="tab" id="t-settings" href="#settings">Settings</a></div>
+<div class="tabs"><a class="tab" id="t-route" href="#route">Route</a><a class="tab" id="t-teach" href="#teach">Teach</a><a class="tab" id="t-eval" href="#eval">Evaluate</a><a class="tab" id="t-bench" href="#bench">Benchmark</a><a class="tab" id="t-settings" href="#settings">Settings</a></div>
 
 <div id="v-route"><p class="mut">Describe a task. The graph picks the tools.</p>
 <input id="task" value="read the config file and write a summary to notes.txt">
@@ -20,8 +20,9 @@
 <div id="tl"></div><p class="mut" id="picked">Picked: none</p>
 <button class="btn pri" id="teachbtn">Teach it</button><p class="mut" id="tmeta"></p>
 <div class="cols"><div><b>Before</b><div id="tb"></div></div><div><b>After</b><div id="ta"></div></div></div>
-<p class="mut" style="font-size:14px">The demo server is on a free instance, so lessons reset when it restarts.</p></div>
+<p class="mut" style="font-size:14px">Lessons are shared by all visitors and saved to a database, so they survive restarts. Limit: 10 per hour per visitor.</p></div>
 
+<div id="v-eval" hidden><p class="mut">Held-out tasks the graph never learned from. Compares the graph, the graph without sequence edges, and a keyword baseline.</p><button class="btn pri" id="egob">Run evaluation</button><div id="eout"></div></div>
 <div id="v-bench" hidden><p class="mut">100 requests each at 1, 5 and 20 concurrent. Every request walks the graph, no cache. One run at a time.</p>
 <button class="btn pri" id="bgo">Run benchmark</button><div id="bout"></div></div>
 
@@ -35,7 +36,7 @@
 var $=function(i){return document.getElementById(i)},picked=[],K=parseInt(DP.get("k")||"5",10);
 function j(u,o){return fetch(u,o).then(function(r){return r.json()})}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
-function view(){var v=(location.hash||"#route").slice(1);["route","teach","bench","settings"].forEach(function(n){$("v-"+n).hidden=n!==v;$("t-"+n).className=n===v?"tab on":"tab"})}
+function view(){var v=(location.hash||"#route").slice(1);["route","teach","eval","bench","settings"].forEach(function(n){$("v-"+n).hidden=n!==v;$("t-"+n).className=n===v?"tab on":"tab"})}
 addEventListener("hashchange",view);view();
 function list(box,ids){box.textContent="";ids.forEach(function(t,i){var p=t.split("__"),c=el("div","row");c.appendChild(el("b",null,(i+1)+". "+p.slice(1).join("__")));c.appendChild(el("span","mut","  "+p[0]));box.appendChild(c)})}
 $("go").onclick=function(){var m=$("rmeta");m.textContent="Traversing the graph...";$("rbox").textContent="";
@@ -50,7 +51,7 @@ $("picked").textContent="Picked: "+(picked.join(" > ")||"none")};$("tl").appendC
 $("teachbtn").onclick=function(){var m=$("tmeta");m.textContent="Writing to HydraDB...";
 j("/learn",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:$("task").value,tools:picked})}).then(function(d){
 if(d.error){m.textContent=d.error;return}
-m.textContent="Wrote "+d.edges_written.USED_FOR+" word-to-tool and "+d.edges_written.FOLLOWS+" sequence edges.";
+m.textContent="Wrote "+d.edges_written.USED_FOR+" word-to-tool and "+d.edges_written.FOLLOWS+" sequence edges."+(d.persisted?" Saved for good.":" Not saved (no database).");
 list($("tb"),d.before);list($("ta"),d.after)}).catch(function(){m.textContent="Server unreachable"})};
 $("bgo").onclick=function(){var o=$("bout");o.textContent="Running, about 10 to 60 seconds...";
 j("/bench").then(function(d){if(!d.rows){o.textContent=d.error||"Failed";return}
@@ -62,4 +63,9 @@ $("theme").value=DP.get("theme")||"auto";$("theme").onchange=function(){DP.set("
 $("motion").value=DP.get("motion")||"auto";$("motion").onchange=function(){DP.set("motion",this.value);if(this.value==="auto")delete DP.root.dataset.motion;else DP.root.dataset.motion=this.value};
 $("ckv").textContent=DP.get("cookies")||"not chosen";
 $("ckr").onclick=function(){try{localStorage.removeItem("cookies")}catch(e){}location.reload()};
+$("egob").onclick=function(){var o=$("eout");o.textContent="Running held-out tasks...";
+j("/eval").then(function(d){if(!d.rows){o.textContent=d.error||"Failed";return}
+var h="<p class='mut'>"+d.tasks+" held-out tasks. Loading every tool: recall 1.00, about "+d.preload_tokens+" tokens per call.</p><table><tr><th style='text-align:left'>method</th><th>k</th><th>recall</th><th>precision</th><th>all found</th><th>tokens</th></tr>";
+d.rows.forEach(function(r){h+="<tr><td style='text-align:left'>"+r.method+"</td><td>"+r.k+"</td><td>"+r.recall+"</td><td>"+r.precision+"</td><td>"+r.all_found+"</td><td>"+r.tokens+"</td></tr>"});
+o.innerHTML=h+"</table>"}).catch(function(){o.textContent="Server unreachable"})};
 </script></body></html>

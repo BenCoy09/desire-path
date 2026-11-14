@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: API docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><script src="shared.js"></script>
+<style>pre{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;overflow:auto;font-size:13px}</style></head><body>
+<nav><div class="wrap"><a class="brand" href="index.html">Desire Path</a><a href="app.html">App</a></div></nav>
+<main class="wrap" style="max-width:760px;padding-top:24px"><h1 style="font-size:34px">API</h1>
+<p class="mut">Plain HTTP, JSON, no key needed on the demo. Base URL: <b id="b"></b></p>
+<h2>Route a task</h2><pre id="c1"></pre>
+<p class="mut">Returns <code>tools</code> (name, server) and <code>traversal_ms</code>. If nothing matches it returns <code>no_confident_match</code>.</p>
+<h2>Teach it</h2><pre id="c2"></pre>
+<p class="mut">List the tools a finished task really used, in order, as <code>server__name</code> (see <code>/tools</code>). Limit: 10 lessons per hour per visitor.</p>
+<h2>Agent loop</h2><pre id="c3"></pre>
+<h2>Other endpoints</h2><p class="mut"><code>GET /tools</code> catalog ids. <code>GET /eval</code> held-out metrics. <code>GET /bench</code> load test (one at a time). <code>GET /status</code> persistence. <code>GET /health</code>.</p>
+</main><script>
+var B=location.origin;document.getElementById("b").textContent=B;
+document.getElementById("c1").textContent='curl "'+B+'/select?k=5&task=read+the+config+file+and+summarize+it"';
+document.getElementById("c2").textContent='curl -X POST '+B+'/learn -H "Content-Type: application/json" \\\n  -d \'{"task":"read the config file and summarize it","tools":["filesystem__read_text_file","filesystem__write_file"]}\'';
+document.getElementById("c3").textContent='import requests\nBASE = "'+B+'"\n\ntask = "read the config file and summarize it"\nr = requests.get(BASE + "/select", params={"task": task, "k": 5}).json()\nneeded = [t["server"] + "__" + t["name"] for t in r.get("tools", [])]\n# 1. load only these tool definitions into your agent prompt\n# 2. run the task\nused = needed  # replace with the tools the run actually used\n# 3. on success, teach the graph\nrequests.post(BASE + "/learn", json={"task": task, "tools": used})';
+</script></body></html>

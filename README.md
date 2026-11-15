@@ -114,7 +114,7 @@ flowchart LR
 
 ## Who would pay
 
-Teams running agents against many MCP servers, where tool definitions eat the context window and the bill. Proposed plans (no paying customers yet): **Open source** (free, self-host) · **Team** ($49/month, proposed: hosted graph, usage dashboard, shared learning across agents) · **Enterprise** (private deployment, audit trail, custom catalogs). Early access: open an issue at https://github.com/BenCoy09/desire-path/issues. Roadmap: bring-your-own tool catalog, per-user API keys, password reset, billing.
+Teams running agents against many MCP servers, where tool definitions eat the context window and the bill. Proposed plans (no paying customers yet): **Open source** (free, self-host) · **Team** ($49/month, proposed: hosted graph, usage dashboard, shared learning across agents) · **Enterprise** (private deployment, audit trail, custom catalogs). Early access: fill in the form at https://tally.so/r/gbd2P1. Roadmap: bring-your-own tool catalog, per-user API keys, password reset, billing.
 
 ## For agent builders
 

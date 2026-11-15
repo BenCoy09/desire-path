@@ -2,7 +2,7 @@
 
 > Agents shouldn't load every tool. They should follow the trail earlier tasks already wore into the graph.
 
-**Live app:** https://desire-path.onrender.com (free host: the first visit can take about a minute to wake) · **Try it without signing up:** open `/account.html` and click *Try the demo* · **API:** `/docs.html`
+**Demo video:** https://youtu.be/PtK8uJR-uN4 · **Live app:** https://desire-path.onrender.com (free host: the first visit can take about a minute to wake) · **Try it without signing up:** open `/account.html` and click *Try the demo* · **API:** `/docs.html`
 
 Built for the HydraDB hackathon (Nov 14–16, 2026), **Track 2: the agent context layer**. HydraDB is the graph database.
 

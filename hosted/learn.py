@@ -157,9 +157,10 @@ def teach_user(uid, task, tools):
         if journal.count(uid) >= 200:
             raise RuntimeError("workspace lesson limit reached (200)")
         before = [t["id"] for t in user_select(uid, task)[0]]
-        journal.add(task, tools, uid)
         apply_user(tv.db, uid, task, tools, terms)
-        return {"before": before, "after": [t["id"] for t in user_select(uid, task)[0]], "persisted": True}
+        after = [t["id"] for t in user_select(uid, task)[0]]
+        journal.add(task, tools, uid, before, after)
+        return {"before": before, "after": after, "persisted": True}
 
 
 def history():

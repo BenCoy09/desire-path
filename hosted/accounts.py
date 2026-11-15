@@ -162,8 +162,8 @@ def _route(h, m, p, q, b):
             return _send(h, 200, {"tools": [], "no_confident_match": True, "traversal_ms": ms})
         return _send(h, 200, {"tools": [{"name": t["name"], "server": t.get("server")} for t in tools], "traversal_ms": ms})
     if p == "/my/lessons":
-        rows = journal.q("SELECT task, tools, created_at::text FROM lessons WHERE user_id=%s ORDER BY id DESC LIMIT 50", (u[0],), many=True)
-        return _send(h, 200, {"lessons": [{"task": r[0], "tools": json.loads(r[1]), "at": r[2][:16]} for r in rows]})
+        rows = journal.q("SELECT task, tools, created_at::text, before_ids, after_ids FROM lessons WHERE user_id=%s ORDER BY id DESC LIMIT 50", (u[0],), many=True)
+        return _send(h, 200, {"lessons": [{"task": r[0], "tools": json.loads(r[1]), "at": r[2][:16], "before": json.loads(r[3]) if r[3] else None, "after": json.loads(r[4]) if r[4] else None} for r in rows]})
     if m == "POST" and p == "/my/learn":
         return _send(h, 200, learn.teach_user(u[0], b.get("task", ""), b.get("tools") or []))
     _send(h, 404, {"error": "not found"})

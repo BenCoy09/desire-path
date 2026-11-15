@@ -8,7 +8,7 @@ DP.me=new Promise(function(res){try{fetch("/me").then(function(r){return r.json(
 function esc(x){return String(x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 var LOGO='<svg class="logo" viewBox="0 0 32 32"><path d="M5 27C9 20 12 23 16 16S22 8 27 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/></svg>';
 DP.navHTML=function(me,path){
-var h='<a class="brand" href="/">'+LOGO+'Desire Path</a><a href="/#how">How it works</a><a href="/#proof">Proof</a><a href="/#pricing">Pricing</a><a href="/#faq">FAQ</a><a href="/docs">Docs</a>';
+var h='<a class="brand" href="/">'+LOGO+'Desire Path</a><a href="/#how">How it works</a><a href="/#proof">Proof</a><a href="/#pricing">Pricing</a><a href="/#faq">FAQ</a><a href="/docs">Docs</a><a href="/history.html">History</a>';
 if(me){var dm=/@demo\.invalid$/.test(me.email);
 h+='<span class="avatar" title="'+esc(dm?"Demo workspace":me.email)+'">'+esc(dm?"D":me.email.charAt(0).toUpperCase())+'</span><button class="btn" id="dp-out">Log out</button>';
 if(path!=="/app")h+='<a class="btn pri" href="/app">Workspace</a>'}

@@ -14,7 +14,7 @@ Most agents paste every tool definition into every prompt. Desire Path learns wh
 
 Measured on 10 held-out tasks the graph never learned from (live `/eval`):
 
-| Method | Tools returned | Recall | Precision | All needed found | Tokens per call |
+| Method | Tools returned | Recall | Precision | All needed found | Est. tokens per call |
 |---|---|---|---|---|---|
 | Load every tool | all | 1.00 | n/a | 1.00 | ~16,334 |
 | **Desire Path (graph)** | **3** | **0.97** | 0.55 | **0.90** | **1,032** |
@@ -22,7 +22,20 @@ Measured on 10 held-out tasks the graph never learned from (live `/eval`):
 | **Desire Path (graph)** | **5** | **0.97** | 0.36 | **0.90** | **1,628** |
 | Keyword baseline (BM25) | 5 | 0.30 | 0.12 | 0.20 | 1,925 |
 
-That is about **94% fewer tokens at k=3** (90% at k=5) while finding 97% of the tools a task needs, against 27% to 30% for keyword search. Numbers move slightly as visitors teach the shared demo; the live app and `GET /eval` always show the current ones.
+By character count that is about 94% fewer tokens at k=3, and **measured with real agents (next section) the saving is about 89%**. The graph finds 97% of the tools a task needs, against 27% to 30% for keyword search. Numbers move slightly as visitors teach the shared demo; the live app and `GET /eval` always show the current ones.
+
+## Real agent runs (end-to-end)
+
+Gemini agents used real MCP tools on 10 held-out tasks, one run each. Success is checked by code, not by an LLM judge (this is the table on the landing page).
+
+| Tools given to the agent | Passed | Prompt tokens per task | LLM calls per task |
+|---|---|---|---|
+| All 42 tools, every call | 10/10 | 29,352 | 4.3 |
+| Keyword search (BM25), top 5 | 4/10 | 10,835 | 5.9 |
+| Keyword search (BM25), top 3 | 2/10 | 5,622 | 6.3 |
+| **Desire Path graph, 5 tools** | **10/10** | **3,239** | **3.1** |
+
+Same pass rate as loading everything, with about 89% fewer prompt tokens and about 28% fewer LLM calls. Keyword search with a similar budget failed most tasks.
 
 ## Why "desire path"
 
@@ -65,7 +78,7 @@ flowchart LR
 
 | Claim | How to verify |
 |---|---|
-| ~94% fewer tokens than loading every tool | App → **Evaluate** tab, or `GET /eval` |
+| About 89% fewer prompt tokens, same pass rate | The Real agent runs table on the landing page (estimated counts on the Evaluate tab) |
 | Recall 0.97 vs 0.27 (keyword), held-out tasks | Same; offline: `python scripts/learn_graph.py --no-write` |
 | Routing is a real graph walk, no LLM | Read `Selector.select` in `scripts/learn_graph.py` (~40 lines); every `/select` issues Cypher to HydraDB |
 | It improves with learning | `results/learning_curve.json`, plotted on the landing page |
@@ -80,7 +93,7 @@ flowchart LR
 - **Sequence edges added nothing here.** The graph without `FOLLOWS` ties the full graph at k=3 and has slightly better precision at k=5 (0.38 vs 0.36). The word-to-tool edges do the work. We keep `FOLLOWS` in the graph but do not claim it helps on this catalog.
 - **Precision is low.** The router is recall-first: at k=5 it returns extra tools (precision 0.36). The token cost is still about a tenth of loading everything.
 - **Small test.** 10 held-out tasks, so one task moves "all found" by 0.10. Treat this as early evidence, not a benchmark.
-- **We report retrieval, not end-to-end agent success.** We make no claim that agents finish more tasks with it.
+- **Small end-to-end test.** One run per task on 10 tasks, one model, so one task moves a rate by 10 points. We compared against loading everything and one-shot keyword search only.
 - **We tried SelfGraph and dropped it.** SelfGraph connected to our HydraDB v0.4.0, but its writes failed: the node logged that an object-store put mode (`PutMode::Update`) is not implemented for the local-file store we run. So the versioned history (`/history.html`) is our own: every lesson is timestamped in Postgres with what routing returned before and after.
 - **Fixed catalog.** Four MCP servers. Bring-your-own catalog is the first thing on the roadmap.
 - **Free-tier host.** The demo sleeps when idle (first request can take about a minute) and HydraDB's disk resets on restart; lessons are replayed from Postgres at startup.

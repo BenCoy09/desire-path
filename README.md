@@ -24,7 +24,7 @@ The graph matched the pass rate of loading everything with about **89% fewer pro
 These rows are generated from `results/traces.jsonl` by `python scripts/make_results.py` (output: `results/RESULTS.md`, with a per-task pass/fail matrix). Runs that died on API errors are excluded and counted there.
 
 ### Scale check (partial)
-We padded the catalog with synthetic tools (`results/synth_catalog_100.json`, `_300`, `_1000`) to test routing among more distractors. With a 100-tool catalog the graph again passed **10/10** at 3,239 prompt tokens per task (run `graph_5_N100`). The 300- and 1,000-tool runs **did not finish**: they hit API quota errors (0 clean runs at 300, 1 at 1,000), so we report no result for them. Preload on the padded 100-tool catalog also never completed, so we make no comparison against it.
+We padded the catalog with synthetic tools (`results/synth_catalog_100.json`, `_300`, `_1000`) to test routing among more distractors. With 100 extra synthetic tools offered alongside the 42 real ones, the graph again passed **10/10** at 3,239 prompt tokens per task (run `graph_5_N100`). The 300- and 1,000-tool runs **did not finish**: they hit API quota errors (0 clean runs at 300, 1 at 1,000), so we report no result for them. Preload with those extra tools also never completed, so we make no comparison against it.
 
 ### Retrieval check (no model calls)
 On the same 10 held-out tasks: how many of the tools the agent really needed did the router return? This runs against the live graph (`GET /eval`) and can drift slightly because visitors can teach the shared demo.
@@ -102,7 +102,7 @@ flowchart LR
 - **Small test:** 10 held-out tasks, one clean run each, one model, free-tier API. One task moves a rate by 10 points.
 - **Same task families:** the test tasks are new instances of the same workflow families the graph learned from. We have not shown it transfers to new kinds of work.
 - **Limited baselines:** loading everything and one-shot keyword search only. No agent that can search again, and no embedding baseline.
-- **Scale:** only the 100-tool padded catalog finished (see above); the extra tools are synthetic.
+- **Scale:** only the run with 100 extra synthetic tools finished (see above).
 - **Precision is low:** the router favors recall. At k=5 it returns extra tools, and the token cost is still about a tenth of loading everything.
 - **Sequence edges** did not help on this catalog.
 - **SelfGraph:** we tried it and dropped it. Its writes failed because our local-file object store does not implement `PutMode::Update`, so the history page is our own Postgres log of every lesson.

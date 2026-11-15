@@ -2,7 +2,7 @@
 
 > Agents shouldn't load every tool. They should follow the trail earlier tasks already wore into the graph.
 
-**Live:** https://desire-path.onrender.com  ·  **No signup needed:** open `/account` and click *Try the demo*  ·  **Walkthrough:** [Loom](LOOM_URL)
+**Live:** https://desire-path.onrender.com  ·  **No signup needed:** open `/account` and click *Try the demo*  ·  **Walkthrough:** [Youtube] (https://youtu.be/PtK8uJR-uN4?is=BiGIvQSOs8WAK1aA))
 
 Built for the HydraDB hackathon (Nov 14–16, 2026), Track 2: the agent context layer. Learning loop included.
 

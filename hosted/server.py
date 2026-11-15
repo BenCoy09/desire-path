@@ -88,7 +88,9 @@ class Hosted(tv.H):
             return self.bench()
         if u.path == "/curve":
             return self.file(common.ROOT / "results" / "learning_curve.json")
-        rel = "index.html" if u.path in ("", "/") else u.path.lstrip("/")
+        _p = u.path.strip("/")
+        rel = ("index.html" if _p == "" else _p + ".html" if _p in ("app", "docs", "explore", "live", "account", "dashboard")
+               else u.path.lstrip("/"))
         p = (SITE / rel).resolve()
         if SITE.resolve() not in p.parents and p != SITE.resolve():
             return self.reply(404, {"error": "not found"})

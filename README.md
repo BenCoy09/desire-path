@@ -178,3 +178,29 @@ Dockerfile start.sh                           one container: HydraDB + service
 Built on the open-source [HydraDB](https://github.com/hydra-db/hydradb) engine (v0.4.0). Tool definitions come from public MCP servers. Hosted on Render with Neon Postgres for accounts and the lesson journal.
 
 License: MIT.
+
+## Use it from Claude (MCP)
+
+`scripts/dp_mcp.py` is a small MCP server (stdio, Python standard library only). It lets an MCP client ask Desire Path which tools a task needs, and optionally teach it what a run used. It calls the public API, so by default it talks to the shared demo.
+
+| Tool | What it does |
+|---|---|
+| `route_tools(task, k)` | Returns the tool ids to load for the task (a graph lookup in HydraDB) |
+| `list_catalog()` | Lists the tool ids Desire Path knows |
+| `teach_tools(task, tools)` | Teaches it which tools a finished task used. Off unless `DESIRE_PATH_ALLOW_TEACH=1`, because the demo graph is shared |
+
+Claude Code:
+
+```bash
+claude mcp add desire-path -- python3 /path/to/desire-path/scripts/dp_mcp.py
+```
+
+Claude Desktop (`claude_desktop_config.json`):
+
+```json
+{"mcpServers": {"desire-path": {"command": "python3", "args": ["/path/to/desire-path/scripts/dp_mcp.py"]}}}
+```
+
+Set `DESIRE_PATH_URL` to use your own deployment instead of the demo.
+
+Status: tested from the command line against a stand-in API. Not yet verified inside any MCP client. A client that connects this server still loads its other servers' tool definitions as usual; the saving comes when an agent calls `route_tools` first and loads only the tools it returns. Per-workspace API keys are not built yet.

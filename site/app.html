@@ -8,7 +8,7 @@
 <main class="wrap" style="padding-top:24px;max-width:760px">
 <h1 style="font-size:34px">Route, teach, measure</h1>
 <p class="mut" id="mode">Checking your session...</p>
-<div class="tabs"><a class="tab" id="t-route" href="#route">Route</a><a class="tab" id="t-teach" href="#teach">Teach</a><a class="tab" id="t-lessons" href="#lessons" style="display:none">Lessons</a><a class="tab" id="t-eval" href="#eval">Evaluate</a><a class="tab" id="t-bench" href="#bench">Benchmark</a><a class="tab" id="t-settings" href="#settings">Settings</a></div>
+<div class="tabs"><a class="tab" id="t-route" href="#route">Route</a><a class="tab" id="t-teach" href="#teach">Teach</a><a class="tab" id="t-lessons" href="#lessons" style="display:none">Lessons</a><a class="tab" id="t-eval" href="#eval">Evaluate</a><a class="tab" id="t-bench" href="#bench">Benchmark</a><a class="tab" id="t-connect" href="#connect">Connect</a><a class="tab" id="t-settings" href="#settings">Settings</a></div>
 
 <div id="v-route"><div class="card" id="ob"><b>Start here</b><p class="mut">Tap an example, check which tools the graph picks, then teach it a correction and route again to see it change.</p><div id="exs"></div><details><summary class="mut">Use it from your own agent</summary><pre id="snip" style="overflow:auto;font-size:12px"></pre><p class="mut" style="font-size:13px">Or as an MCP server for Claude Code or Claude Desktop:</p><pre style="overflow:auto;font-size:12px">claude mcp add desire-path -- python3 /path/to/desire-path/scripts/dp_mcp.py</pre><p class="mut" style="font-size:13px">It calls the shared demo graph. Private workspaces are not reachable from it yet. <a href="/docs">Setup in the docs</a>.</p></details></div><p class="mut">Describe a task. The graph picks the tools.</p>
 <input id="task" value="read the config file and write a summary to notes.txt">
@@ -27,6 +27,15 @@
 <div id="v-bench" hidden><p class="mut">100 requests each at 1, 5 and 20 concurrent. Every request walks the graph, no cache. One run at a time.</p>
 <button class="btn pri" id="bgo">Run benchmark</button><div id="bout"></div></div>
 
+<div id="v-connect" hidden><p class="mut">Use Desire Path from your own agent. Both ways call this site.</p>
+<div class="card"><b>1. As an MCP server (Claude Code, Claude Desktop)</b>
+<p class="mut" style="font-size:14px">Three tools: route_tools, list_catalog, and teach_tools (off by default, because the demo graph is shared). Get scripts/dp_mcp.py from the repo, then run:</p>
+<pre id="c1" style="overflow:auto;font-size:12px">claude mcp add desire-path -- python3 /path/to/desire-path/scripts/dp_mcp.py</pre><button class="btn" data-copy="c1">Copy</button>
+<p class="mut" style="font-size:13px;margin-top:10px">Claude Desktop config:</p>
+<pre id="c2" style="overflow:auto;font-size:12px">{"mcpServers": {"desire-path": {"command": "python3", "args": ["/path/to/desire-path/scripts/dp_mcp.py"]}}}</pre><button class="btn" data-copy="c2">Copy</button></div>
+<div class="card" style="margin-top:12px"><b>2. As an HTTP call from any agent</b>
+<pre id="c3" style="overflow:auto;font-size:12px"></pre><button class="btn" data-copy="c3">Copy</button></div>
+<p class="mut" style="font-size:13px;margin-top:10px">Limits: tested from the command line, not yet verified inside Claude Desktop or Claude Code. A client still loads its other tools as usual; the saving comes when the agent calls route_tools first. Both ways use the shared demo graph, so private workspaces are not reachable yet. <a href="https://github.com/BenCoy09/desire-path#use-it-from-claude-mcp">Setup in the README</a>.</p></div>
 <div id="v-settings" hidden><div class="card">
 <p><label>Tools returned per task: <b id="kv"></b></label><input type="range" id="k" min="3" max="10"></p>
 <p><label>Theme</label><select id="theme"><option value="auto">Match device</option><option value="light">Light</option><option value="dark">Dark</option></select></p>
@@ -38,7 +47,7 @@ window.DP_PATH="/app";var $=function(i){return document.getElementById(i)},picke
 function j(u,o){return fetch(u,o).then(function(r){return r.json().then(function(d){d._s=r.status;return d})})}
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function B(){return ME?"/my":""}
-var TABS=["route","teach","lessons","eval","bench","settings"],CUR=(location.hash||"#route").slice(1);
+var TABS=["route","teach","lessons","eval","bench","connect","settings"],CUR=(location.hash||"#route").slice(1);
 function clean(){try{history.replaceState(null,"","/")}catch(e){}}
 function view(){var v=CUR;if(TABS.indexOf(v)<0||(v==="lessons"&&!ME))v="route";
 TABS.forEach(function(n){$("v-"+n).hidden=n!==v;$("t-"+n).className=n===v?"tab on":"tab"})}
@@ -90,4 +99,7 @@ o.innerHTML=h+"</table>"}).catch(function(){o.textContent="Server unreachable"})
 (function(){var ex=["read the config file and write a summary to notes.txt","find every file that mentions invoices and list them","move old logs into an archive folder","Save the text: Q4 draft into reports/q4.txt"],b=$("exs");
 ex.forEach(function(t){var x=el("button","btn",t);x.onclick=function(){$("task").value=t;$("go").click()};b.appendChild(x)});
 $("snip").textContent='curl -G "'+location.origin+'/select" \\\n  --data-urlencode "task=read the config file and summarize it" -d k=5'})();
+(function(){var c3=$("c3");if(c3)c3.textContent='curl -G "'+location.origin+'/select" \\\n  --data-urlencode "task=read the config file and summarize it" -d k=5';
+Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"),function(b){b.onclick=function(){var t=$(b.getAttribute("data-copy")).textContent;
+try{navigator.clipboard.writeText(t).then(function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy"},1500)},function(){b.textContent="Select and copy"})}catch(e){b.textContent="Select and copy"}}})})();
 </script></body></html>

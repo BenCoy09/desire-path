@@ -12,6 +12,7 @@
 <p class="mut">List the tools a finished task really used, in order, as <code>server__name</code> (see <code>/tools</code>). Limit: 10 lessons per hour per visitor.</p>
 <h2>Agent loop</h2><pre id="c3"></pre>
 <h2>Other endpoints</h2><p class="mut"><code>GET /tools</code> catalog ids. <code>GET /eval</code> held-out metrics. <code>GET /bench</code> load test (one at a time). <code>GET /status</code> persistence. <code>GET /health</code>.</p>
+<section><div class="wrap"><h2>Use it from Claude (MCP)</h2><p class="mut">An MCP server that lets Claude ask Desire Path which tools a task needs. It runs on your machine and calls this site. Three tools: route_tools, list_catalog, and teach_tools (off by default, because the demo graph is shared).</p><div class="card"><pre style="overflow:auto;font-size:13px">claude mcp add desire-path -- python3 /path/to/desire-path/scripts/dp_mcp.py</pre></div><p class="mut" style="font-size:14px">Tested from the command line. Not yet verified inside Claude Desktop or Claude Code. A client still loads its other tools as usual; the saving comes when the agent calls route_tools first. Setup details are in the <a href="https://github.com/BenCoy09/desire-path#use-it-from-claude-mcp">README</a>.</p></div></section>
 </main><script>
 var B=location.origin;document.getElementById("b").textContent=B;
 document.getElementById("c1").textContent='curl "'+B+'/select?k=5&task=read+the+config+file+and+summarize+it"';

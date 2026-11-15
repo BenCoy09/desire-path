@@ -27,6 +27,7 @@
 <p class="mut">Price per 1M input tokens ($), edit to match your model</p><input id="pp" type="number" value="3" step="0.1">
 <p id="sv"></p><p class="mut" style="font-size:14px">Assumes each call would otherwise carry the whole tool catalog.</p></div></div></section>
 <section><div class="wrap"><h2>Real agent runs</h2><p class="mut">Gemini agents using real MCP tools, success checked by code. Ten held-out tasks, one run each. The graph row is from a run where 100 extra synthetic tools were also on offer; the same run on the real 42 tools also passed 10 of 10, at 3,241 prompt tokens.</p><div class="card"><table id="real"></table></div></div></section>
+<section><div class="wrap"><h2>Use it from Claude</h2><p class="mut">Desire Path ships an MCP server. Your agent asks which tools a task needs and loads only those. <a href="/docs">Setup in the docs</a>.</p></div></section>
 <section id="how"><div class="wrap"><h2>How it works</h2><div class="grid">
 <div class="card"><h3>1. Learn</h3><p class="mut">Successful runs become edges in HydraDB: task words point to the tools that were needed, and tools point to the ones that usually come next.</p></div>
 <div class="card"><h3>2. Traverse</h3><p class="mut">A new task walks those edges in milliseconds. No model call, and only the matching tool definitions go into the prompt.</p></div>

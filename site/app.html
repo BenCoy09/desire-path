@@ -10,7 +10,7 @@
 <p class="mut" id="mode">Checking your session...</p>
 <div class="tabs"><a class="tab" id="t-route" href="#route">Route</a><a class="tab" id="t-teach" href="#teach">Teach</a><a class="tab" id="t-lessons" href="#lessons" style="display:none">Lessons</a><a class="tab" id="t-eval" href="#eval">Evaluate</a><a class="tab" id="t-bench" href="#bench">Benchmark</a><a class="tab" id="t-settings" href="#settings">Settings</a></div>
 
-<div id="v-route"><p class="mut">Describe a task. The graph picks the tools.</p>
+<div id="v-route"><div class="card" id="ob"><b>Start here</b><p class="mut">Tap an example, check which tools the graph picks, then teach it a correction and route again to see it change.</p><div id="exs"></div><details><summary class="mut">Use it from your own agent</summary><pre id="snip" style="overflow:auto;font-size:12px"></pre></details></div><p class="mut">Describe a task. The graph picks the tools.</p>
 <input id="task" value="read the config file and write a summary to notes.txt">
 <button class="btn pri" id="go" style="margin-top:10px">Route task</button>
 <p class="mut" id="rmeta"></p><div id="rbox"></div><div id="fb" hidden><p class="mut">Were these the right tools?</p><button class="btn pri" id="fy">Yes, teach this</button><button class="btn" id="fn">No, I will pick them</button><p class="mut" id="fm"></p></div></div>
@@ -86,4 +86,7 @@ j("/eval").then(function(d){if(!d.rows){o.textContent=d.error||"Failed";return}
 var h="<p class='mut'>"+d.tasks+" held-out tasks. Loading every tool: recall 1.00, an estimated "+d.preload_tokens+" tokens of definitions per call (characters divided by 4; measured token counts are on the home page).</p><table><tr><th style='text-align:left'>method</th><th>k</th><th>recall</th><th>precision</th><th>all found</th><th>est. tokens</th></tr>";
 d.rows.forEach(function(r){h+="<tr><td style='text-align:left'>"+r.method+"</td><td>"+r.k+"</td><td>"+r.recall+"</td><td>"+r.precision+"</td><td>"+r.all_found+"</td><td>"+r.tokens+"</td></tr>"});
 o.innerHTML=h+"</table>"}).catch(function(){o.textContent="Server unreachable"})};
+(function(){var ex=["read the config file and write a summary to notes.txt","find every file that mentions invoices and list them","move old logs into an archive folder","Save the text: Q4 draft into reports/q4.txt"],b=$("exs");
+ex.forEach(function(t){var x=el("button","btn",t);x.onclick=function(){$("task").value=t;$("go").click()};b.appendChild(x)});
+$("snip").textContent='curl -G "'+location.origin+'/select" \\\n  --data-urlencode "task=read the config file and summarize it" -d k=5'})();
 </script></body></html>

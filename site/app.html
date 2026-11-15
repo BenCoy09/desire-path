@@ -47,8 +47,9 @@ TABS.forEach(function(n){$("t-"+n).onclick=function(e){e.preventDefault();go(n)}
 addEventListener("hashchange",function(){CUR=(location.hash||"#route").slice(1);view();clean()});
 view();clean();
 function list(box,ids){box.textContent="";ids.forEach(function(t,i){var p=t.split("__"),c=el("div","row");c.appendChild(el("b",null,(i+1)+". "+p.slice(1).join("__")));c.appendChild(el("span","mut","  "+p[0]));box.appendChild(c)})}
+function ba(c,label,ids,other,cls){var d=el("div","mut",label+": ");ids.forEach(function(t,i){d.appendChild(el("span",other.indexOf(t)<0?cls:"",t.replace("__"," / ")));if(i<ids.length-1)d.appendChild(document.createTextNode(", "))});c.appendChild(d)}
 function lessons(){if(!ME)return;j("/my/lessons").then(function(d){var b=$("ls");if(!d.lessons||!d.lessons.length){b.textContent="None yet";return}b.textContent="";
-d.lessons.forEach(function(l){var c=el("div","row");c.appendChild(el("b",null,l.task));c.appendChild(el("div","mut",l.tools.join(" > ")+"  ("+l.at+")"));b.appendChild(c)})}).catch(function(){})}
+d.lessons.forEach(function(l){var c=el("div","row");c.appendChild(el("b",null,l.task));c.appendChild(el("div","mut",l.tools.join(" > ")+"  ("+l.at+")"));if(l.before&&l.after){ba(c,"Before",l.before,l.after,"tgone");ba(c,"After",l.after,l.before,"tnew")}b.appendChild(c)})}).catch(function(){})}
 DP.me.then(function(me){ME=me;
 if(ME){$("mode").textContent="Signed in. A private graph on top of the shared base. "+ME.lessons+" lessons saved to your account.";$("t-lessons").style.display="";$("tnote").textContent="Only your routing changes.";lessons()}
 else{$("mode").innerHTML='Guest mode: you use the shared graph, so lessons you teach are visible to every visitor. <a href="/account#login">Sign in</a> for a private one.';$("tnote").textContent="Lessons are shared by all visitors and saved to a database, so they survive restarts. Limit: 10 per hour per visitor."}

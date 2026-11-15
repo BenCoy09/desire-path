@@ -126,6 +126,8 @@ Teams running agents against many MCP servers, where tool definitions eat the co
 
 ## For agent builders
 
+Paste your own MCP `tools/list` output at `/connect.html` to see what loading all your tools costs and what routing could save (runs in your browser). Export it with `python scripts/export_mcp_tools.py my_tools.json -- <your MCP server command>`. Hosted per-developer catalogs are not available yet.
+
 ```bash
 curl "https://desire-path.onrender.com/select?k=5&task=read+the+config+file+and+summarize+it"
 curl -X POST https://desire-path.onrender.com/learn -H "Content-Type: application/json" \

@@ -1,0 +1,25 @@
+30 traces, 10 families. create_directory id: filesystem__create_directory
+
+LEAVE-ONE-TASK-OUT (new instance), k=4, n=30
+  plain-store                  recall 0.97  all-found 0.97  ~1336 tok  | create_directory offered 4/4
+  graph, no sequence edges     recall 0.97  all-found 0.97  ~1297 tok  | create_directory offered 4/4
+  graph, forward edges (now)   recall 0.97  all-found 0.97  ~1428 tok  | create_directory offered 4/4
+  graph + predecessor edges    recall 0.97  all-found 0.97  ~1477 tok  | create_directory offered 4/4
+
+LEAVE-ONE-FAMILY-OUT (new kind of work), k=4, n=30
+  plain-store                  recall 0.55  all-found 0.40  ~1261 tok  | create_directory offered 4/4
+  graph, no sequence edges     recall 0.58  all-found 0.47  ~1269 tok  | create_directory offered 4/4
+  graph, forward edges (now)   recall 0.58  all-found 0.47  ~1369 tok  | create_directory offered 4/4
+  graph + predecessor edges    recall 0.62  all-found 0.50  ~1432 tok  | create_directory offered 4/4
+
+LEAVE-ONE-TASK-OUT (new instance), k=5, n=30
+  plain-store                  recall 0.97  all-found 0.97  ~1578 tok  | create_directory offered 4/4
+  graph, no sequence edges     recall 0.97  all-found 0.97  ~1561 tok  | create_directory offered 4/4
+  graph, forward edges (now)   recall 0.97  all-found 0.97  ~1663 tok  | create_directory offered 4/4
+  graph + predecessor edges    recall 0.97  all-found 0.97  ~1783 tok  | create_directory offered 4/4
+
+LEAVE-ONE-FAMILY-OUT (new kind of work), k=5, n=30
+  plain-store                  recall 0.55  all-found 0.40  ~1535 tok  | create_directory offered 4/4
+  graph, no sequence edges     recall 0.60  all-found 0.50  ~1548 tok  | create_directory offered 4/4
+  graph, forward edges (now)   recall 0.60  all-found 0.50  ~1615 tok  | create_directory offered 4/4
+  graph + predecessor edges    recall 0.62  all-found 0.50  ~1741 tok  | create_directory offered 4/4

@@ -1,0 +1,4 @@
+quota back
+connected to HydraDB at 127.0.0.1:28687
+model gemini-3.1-flash-lite | method graph_k5 | 10 tasks to run
+T01 FAIL llm=0 prompt_tok=0 offered=[read_text_file,create_entities,edit_file,write_file,move_file] used=[] | RuntimeError: network: <urlopP01 FAIL llm=3 tools=[list_allowed_directories,create_directory,write_file] RuntimeError: network: <urlopen error [Errno -3] Temporary failure in name resolution>

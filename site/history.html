@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Desire Path: lesson history</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><script src="shared.js"></script>
+<style>.new{color:var(--ac2);font-weight:700}.gone{text-decoration:line-through;color:var(--mut)}</style></head><body>
+<nav><div class="wrap"><a class="brand" href="index.html">Desire Path</a><a href="app.html">App</a><a href="docs.html">Docs</a></div></nav>
+<main class="wrap" style="max-width:760px;padding-top:24px"><h1 style="font-size:34px">Lesson history</h1>
+<p class="mut">Every lesson taught on the shared demo is saved with a timestamp, along with what the graph routed for that task before and after. Green means a tool the lesson pulled into the top five.</p>
+<p class="mut" id="sum">Loading...</p><div id="ls"></div></main>
+<script>
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function tools(box,label,ids,other,cls){var d=el("div","mut",label+": ");(ids||[]).forEach(function(t,i){
+var s=el("span",other&&other.indexOf(t)<0?cls:"",t.replace("__"," / "));d.appendChild(s);if(i<ids.length-1)d.appendChild(document.createTextNode(", "))});box.appendChild(d)}
+fetch("/history").then(function(r){return r.json()}).then(function(d){
+var L=d.lessons||[],b=document.getElementById("ls");
+document.getElementById("sum").textContent=d.error?"History unavailable":L.length+" lessons recorded (newest first)";
+L.forEach(function(l){var c=el("div","card");c.style.marginBottom="12px";c.appendChild(el("b",null,l.task));c.appendChild(el("div","mut",l.at.replace("T"," ")+" UTC"));
+tools(c,"Taught",l.tools);
+if(l.before&&l.after){tools(c,"Before",l.before,l.after,"gone");tools(c,"After",l.after,l.before,"new")}
+b.appendChild(c)})}).catch(function(){document.getElementById("sum").textContent="History unavailable"});
+</script></body></html>

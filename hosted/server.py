@@ -71,6 +71,11 @@ class Hosted(tv.H):
             return
         if u.path in ("/select", "/health"):
             return super().do_GET()
+        if u.path == "/history":
+            try:
+                return self.reply(200, {"lessons": learn.history()})
+            except Exception as e:
+                return self.reply(503, {"error": type(e).__name__})
         if u.path == "/status":
             return self.reply(200, dict(learn.status(), selects=FB["selects"], fallbacks=FB["fallbacks"]))
         if u.path == "/eval":

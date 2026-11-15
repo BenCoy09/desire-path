@@ -97,13 +97,14 @@ def teach(task, tools, ip=""):
         s["nt"], s["taught"] = nt, s["taught"] + 1
         HITS[ip] = hits + [now]
         set_ntasks(tv.db, nt)
+        after = [t["id"] for t in tv.sel.select(task, 5)[0]]
         try:
-            saved = journal.add(task, tools)
+            saved = journal.add(task, tools, None, before, after)
         except Exception:
             saved = False
         return {"task": task, "taught": tools, "terms": terms, "persisted": saved,
                 "edges_written": {"USED_FOR": used, "FOLLOWS": fol},
-                "before": before, "after": [t["id"] for t in tv.sel.select(task, 5)[0]]}
+                "before": before, "after": after}
 
 
 # ---- per-user private layer: user-scoped Term nodes pointing at the shared Tool nodes
@@ -159,3 +160,7 @@ def teach_user(uid, task, tools):
         journal.add(task, tools, uid)
         apply_user(tv.db, uid, task, tools, terms)
         return {"before": before, "after": [t["id"] for t in user_select(uid, task)[0]], "persisted": True}
+
+
+def history():
+    return journal.history()

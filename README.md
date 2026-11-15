@@ -33,9 +33,11 @@ Gemini agents used real MCP tools on 10 held-out tasks, one run each. Success is
 | All 42 tools, every call | 10/10 | 29,352 | 4.3 |
 | Keyword search (BM25), top 5 | 4/10 | 10,835 | 5.9 |
 | Keyword search (BM25), top 3 | 2/10 | 5,622 | 6.3 |
-| **Desire Path graph, 5 tools** | **10/10** | **3,239** | **3.1** |
+| **Desire Path graph, 5 tools (same 42-tool catalog)** | **10/10** | **3,241** | **3.1** |
 
 Same pass rate as loading everything, with about 89% fewer prompt tokens and about 28% fewer LLM calls. Keyword search with a similar budget failed most tasks. Every row, a per-task pass/fail matrix, and the runs excluded for API errors are in `results/RESULTS.md`, generated from `results/traces.jsonl` by `python scripts/make_results.py`.
+
+**Scale check (partial).** `scripts/scale_test.py` adds N synthetic distractor tools (ids prefixed `synthetic__`) to the real 42. With 100 added (142 tools offered) the graph again passed 10/10 at 3,239 prompt tokens per task. Runs with 300 and 1,000 added tools did not complete because of API errors (0 clean test runs at 300, 1 at 1,000), and loading all tools on the 142-tool catalog never completed, so we report no comparison for those.
 
 ## Why "desire path"
 

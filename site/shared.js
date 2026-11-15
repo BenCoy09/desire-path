@@ -12,10 +12,10 @@ var h='<a class="brand" href="/">'+LOGO+'Desire Path</a><a href="/#how">How it w
 if(me){var dm=/@demo\.invalid$/.test(me.email);
 h+='<span class="avatar" title="'+esc(dm?"Demo workspace":me.email)+'">'+esc(dm?"D":me.email.charAt(0).toUpperCase())+'</span><button class="btn" id="dp-out">Log out</button>';
 if(path!=="/app")h+='<a class="btn pri" href="/app">Workspace</a>'}
-else{h+='<a href="/account#login">Sign in</a>';if(path!=="/app")h+='<a class="btn pri" href="/app">Open app</a>'}
+else{h+='<a href="/account#login">Sign in</a>';if(path!=="/app")h+='<a class="btn pri" href="/app">Try the demo</a>'}
 return h};
 function nav(me){var w=D.querySelector("nav .wrap");if(!w)return;
-var p=location.pathname.replace(/\/+$/,"")||"/";w.innerHTML=DP.navHTML(me,p);
+var p=window.DP_PATH||(location.pathname.replace(/\/+$/,"")||"/");w.innerHTML=DP.navHTML(me,p);
 var o=D.getElementById("dp-out");
 if(o)o.onclick=function(){fetch("/auth/logout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(function(){location="/"},function(){location="/"})}}
 D.addEventListener("DOMContentLoaded",function(){nav(null);DP.me.then(function(me){if(me)nav(me)})});
